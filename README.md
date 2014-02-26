@@ -1,7 +1,7 @@
 QtEVM
 =====
 
-Yet anther implementation of EVM([Eulerian Video Magnification](http://people.csail.mit.edu/mrub/vidmag/)), based on OpenCV and Qt.
+Yet anther C++ implementation of EVM([Eulerian Video Magnification](http://people.csail.mit.edu/mrub/vidmag/)), based on OpenCV and Qt.
 
 **Currently only laplacian pyramid with IIR temproal filters is implemented.**
 
