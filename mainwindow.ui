@@ -1,0 +1,380 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>708</width>
+    <height>614</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>VideoPlayer</string>
+  </property>
+  <widget class="QWidget" name="centralWidget">
+   <property name="sizePolicy">
+    <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+     <horstretch>0</horstretch>
+     <verstretch>0</verstretch>
+    </sizepolicy>
+   </property>
+   <layout class="QGridLayout" name="gridLayout">
+    <item row="0" column="0">
+     <widget class="QScrollArea" name="scrollArea">
+      <property name="styleSheet">
+       <string notr="true">background-color: qlineargradient(spread:pad, x1:0.489, y1:0, x2:0.5, y2:0.994318, stop:0 rgba(204, 204, 204, 255), stop:1 rgba(102, 102, 102, 255));</string>
+      </property>
+      <property name="widgetResizable">
+       <bool>true</bool>
+      </property>
+      <widget class="QWidget" name="scrollAreaWidgetContents">
+       <property name="geometry">
+        <rect>
+         <x>0</x>
+         <y>0</y>
+         <width>688</width>
+         <height>427</height>
+        </rect>
+       </property>
+       <layout class="QGridLayout" name="gridLayout_2">
+        <item row="0" column="0">
+         <widget class="QLabel" name="videoLabel">
+          <property name="text">
+           <string>No Video</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </widget>
+    </item>
+    <item row="4" column="0">
+     <widget class="QWidget" name="widget" native="true">
+      <layout class="QHBoxLayout" name="horizontalLayout">
+       <item>
+        <spacer name="horizontalSpacer">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <widget class="QPushButton" name="btnLast">
+         <property name="text">
+          <string/>
+         </property>
+         <property name="icon">
+          <iconset resource="myResources.qrc">
+           <normaloff>:/myImages/actions/media-seek-backward.png</normaloff>:/myImages/actions/media-seek-backward.png</iconset>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="btnPlay">
+         <property name="text">
+          <string/>
+         </property>
+         <property name="icon">
+          <iconset resource="myResources.qrc">
+           <normaloff>:/myImages/actions/gtk-media-play-ltr.png</normaloff>:/myImages/actions/gtk-media-play-ltr.png</iconset>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="btnPause">
+         <property name="text">
+          <string/>
+         </property>
+         <property name="icon">
+          <iconset resource="myResources.qrc">
+           <normaloff>:/myImages/actions/gtk-media-pause.png</normaloff>:/myImages/actions/gtk-media-pause.png</iconset>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="btnStop">
+         <property name="text">
+          <string/>
+         </property>
+         <property name="icon">
+          <iconset resource="myResources.qrc">
+           <normaloff>:/myImages/actions/gtk-media-stop.png</normaloff>:/myImages/actions/gtk-media-stop.png</iconset>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="btnNext">
+         <property name="text">
+          <string/>
+         </property>
+         <property name="icon">
+          <iconset resource="myResources.qrc">
+           <normaloff>:/myImages/actions/gtk-media-forward-ltr.png</normaloff>:/myImages/actions/gtk-media-forward-ltr.png</iconset>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="horizontalSpacer_2">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </widget>
+    </item>
+    <item row="2" column="0">
+     <widget class="QSlider" name="progressSlider">
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+     </widget>
+    </item>
+    <item row="3" column="0">
+     <widget class="QLabel" name="timeLabel">
+      <property name="text">
+       <string/>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menuBar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>708</width>
+     <height>17</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menu_File">
+    <property name="title">
+     <string>File(&amp;F)</string>
+    </property>
+    <addaction name="actionOpen"/>
+    <addaction name="actionClose"/>
+    <addaction name="separator"/>
+    <addaction name="actionSave_as"/>
+    <addaction name="separator"/>
+    <addaction name="actionClean_Temp_Files"/>
+    <addaction name="separator"/>
+    <addaction name="actionQuit"/>
+   </widget>
+   <widget class="QMenu" name="menuProcessor">
+    <property name="title">
+     <string>Magnification(&amp;M)</string>
+    </property>
+    <addaction name="actionLapliacian_IIR"/>
+   </widget>
+   <widget class="QMenu" name="menuHelp">
+    <property name="title">
+     <string>Help(&amp;H)</string>
+    </property>
+    <addaction name="actionAbout"/>
+    <addaction name="actionAbout_Qt"/>
+   </widget>
+   <widget class="QMenu" name="menuPlay">
+    <property name="title">
+     <string>Play(&amp;P)</string>
+    </property>
+    <addaction name="actionPlay"/>
+    <addaction name="actionPause"/>
+    <addaction name="actionStop_S"/>
+    <addaction name="actionLast_Frame_L"/>
+    <addaction name="actionNext_Frame_N"/>
+   </widget>
+   <addaction name="menu_File"/>
+   <addaction name="menuPlay"/>
+   <addaction name="menuProcessor"/>
+   <addaction name="menuHelp"/>
+  </widget>
+  <widget class="QToolBar" name="mainToolBar">
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+   <addaction name="actionOpen"/>
+   <addaction name="actionSave_as"/>
+   <addaction name="separator"/>
+   <addaction name="actionPlay"/>
+   <addaction name="actionPause"/>
+   <addaction name="actionStop_S"/>
+   <addaction name="separator"/>
+   <addaction name="actionQuit"/>
+  </widget>
+  <widget class="QStatusBar" name="statusBar"/>
+  <action name="actionOpen">
+   <property name="icon">
+    <iconset resource="myResources.qrc">
+     <normaloff>:/myImages/actions/document-open.png</normaloff>:/myImages/actions/document-open.png</iconset>
+   </property>
+   <property name="text">
+    <string>Open Video(&amp;O)</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+O</string>
+   </property>
+  </action>
+  <action name="actionClose">
+   <property name="icon">
+    <iconset resource="myResources.qrc">
+     <normaloff>:/myImages/actions/gtk-close.png</normaloff>:/myImages/actions/gtk-close.png</iconset>
+   </property>
+   <property name="text">
+    <string>Close Video(&amp;C)</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+W</string>
+   </property>
+  </action>
+  <action name="actionQuit">
+   <property name="icon">
+    <iconset resource="myResources.qrc">
+     <normaloff>:/myImages/actions/gtk-quit.png</normaloff>:/myImages/actions/gtk-quit.png</iconset>
+   </property>
+   <property name="text">
+    <string>Quit(&amp;Q)</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Q</string>
+   </property>
+  </action>
+  <action name="actionSave_as">
+   <property name="icon">
+    <iconset resource="myResources.qrc">
+     <normaloff>:/myImages/actions/document-save-as.png</normaloff>:/myImages/actions/document-save-as.png</iconset>
+   </property>
+   <property name="text">
+    <string>Save as</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+S</string>
+   </property>
+  </action>
+  <action name="actionAbout">
+   <property name="icon">
+    <iconset resource="myResources.qrc">
+     <normaloff>:/myImages/actions/gtk-about.png</normaloff>:/myImages/actions/gtk-about.png</iconset>
+   </property>
+   <property name="text">
+    <string>About(&amp;A)</string>
+   </property>
+   <property name="shortcut">
+    <string>F1</string>
+   </property>
+  </action>
+  <action name="actionAbout_Qt">
+   <property name="icon">
+    <iconset resource="myResources.qrc">
+     <normaloff>:/myImages/actions/gtk-help.png</normaloff>:/myImages/actions/gtk-help.png</iconset>
+   </property>
+   <property name="text">
+    <string>About &amp;Qt</string>
+   </property>
+  </action>
+  <action name="actionPlay">
+   <property name="icon">
+    <iconset resource="myResources.qrc">
+     <normaloff>:/myImages/actions/gtk-media-play-ltr.png</normaloff>:/myImages/actions/gtk-media-play-ltr.png</iconset>
+   </property>
+   <property name="text">
+    <string>Play(&amp;P)</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+P</string>
+   </property>
+  </action>
+  <action name="actionStop_S">
+   <property name="icon">
+    <iconset resource="myResources.qrc">
+     <normaloff>:/myImages/actions/gtk-media-stop.png</normaloff>:/myImages/actions/gtk-media-stop.png</iconset>
+   </property>
+   <property name="text">
+    <string>Stop(&amp;S)</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+T</string>
+   </property>
+  </action>
+  <action name="actionLast_Frame_L">
+   <property name="icon">
+    <iconset resource="myResources.qrc">
+     <normaloff>:/myImages/actions/media-seek-backward.png</normaloff>:/myImages/actions/media-seek-backward.png</iconset>
+   </property>
+   <property name="text">
+    <string>Last Frame(&amp;L)</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+L</string>
+   </property>
+  </action>
+  <action name="actionNext_Frame_N">
+   <property name="icon">
+    <iconset resource="myResources.qrc">
+     <normaloff>:/myImages/actions/media-seek-forward.png</normaloff>:/myImages/actions/media-seek-forward.png</iconset>
+   </property>
+   <property name="text">
+    <string>Next Frame(&amp;N)</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+N</string>
+   </property>
+  </action>
+  <action name="actionPause">
+   <property name="icon">
+    <iconset resource="myResources.qrc">
+     <normaloff>:/myImages/actions/gtk-media-pause.png</normaloff>:/myImages/actions/gtk-media-pause.png</iconset>
+   </property>
+   <property name="text">
+    <string>Pause</string>
+   </property>
+  </action>
+  <action name="action_Morpho">
+   <property name="text">
+    <string>&amp;Morphology Transform</string>
+   </property>
+  </action>
+  <action name="actionClean_Temp_Files">
+   <property name="icon">
+    <iconset resource="myResources.qrc">
+     <normaloff>:/myImages/actions/edit-clear.png</normaloff>:/myImages/actions/edit-clear.png</iconset>
+   </property>
+   <property name="text">
+    <string>Clean Temp Files</string>
+   </property>
+  </action>
+  <action name="actionLapliacian_IIR">
+   <property name="text">
+    <string>&amp;Lapliacian IIR</string>
+   </property>
+  </action>
+ </widget>
+ <layoutdefault spacing="6" margin="11"/>
+ <resources>
+  <include location="myResources.qrc"/>
+ </resources>
+ <connections/>
+</ui>
