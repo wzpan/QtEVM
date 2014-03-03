@@ -95,6 +95,8 @@ private slots:
 
     void on_motion_triggered();
 
+    void on_color_triggered();
+
 protected:
     void closeEvent(QCloseEvent *);
     

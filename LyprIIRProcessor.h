@@ -10,7 +10,7 @@ class LyprIIRProcessor : public FrameProcessor
     friend class LyprIIRDialog;
 
 public:
-    LyprIIRProcessor();
+    LyprIIRProcessor(int levels=6);
 
     // Spatial laplacian temporal IIR processing method
     void process(const cv::Mat &img, cv::Mat &out);
@@ -18,6 +18,7 @@ public:
 
 private:
     int levels;
+    double samplingRate;
     bool is_not_first_frame;
     float alpha;
     float lambda_c;

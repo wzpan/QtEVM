@@ -521,3 +521,8 @@ void MainWindow::on_motion_triggered()
         process();
     }
 }
+
+void MainWindow::on_color_triggered()
+{
+
+}

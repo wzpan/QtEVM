@@ -18,8 +18,7 @@ SOURCES += main.cpp\
     VideoPlayer.cpp \
     LyprIIRDialog.cpp \
     LyprIIRProcessor.cpp \
-    GdownIdealDialog.cpp \
-    GdownIdealProcessor.cpp
+    GdownIdealDialog.cpp
 
 HEADERS  += mainwindow.h \
     FrameProcessor.h \
@@ -28,8 +27,7 @@ HEADERS  += mainwindow.h \
     VideoPlayer.h \
     LyprIIRProcessor.h \
     LyprIIRDialog.h \
-    GdownIdealDialog.h \
-    GdownIdealProcessor.h
+    GdownIdealDialog.h
 
 FORMS    += mainwindow.ui \
     LyprIIRDialog.ui \

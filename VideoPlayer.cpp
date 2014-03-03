@@ -569,7 +569,7 @@ void VideoPlayer::pauseIt()
 }
 
 /** 
- * runProcess	-	process the frames of the sequence
+ * processFrame	-	process the frames of the sequence
  *
  */
 void VideoPlayer::processFrame()

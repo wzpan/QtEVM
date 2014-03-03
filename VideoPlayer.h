@@ -45,6 +45,9 @@ public:
     // get the current playing progress
     long getNumberOfPlayedFrames();
 
+    // get the video capture
+    cv::VideoCapture getCapture();
+
     // return the size of the video frame
     cv::Size getFrameSize();
 

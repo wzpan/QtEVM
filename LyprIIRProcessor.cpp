@@ -12,15 +12,15 @@
 
 #include "LyprIIRProcessor.h"
 
-LyprIIRProcessor::LyprIIRProcessor()
-    : levels(6)
-    , is_not_first_frame(false)
+LyprIIRProcessor::LyprIIRProcessor(int levels)
+    : is_not_first_frame(false)
     , alpha(10)
     , lambda_c(16)
     , r1(0.4)
     , r2(0.05)
     , chromAttenuation(0.1)
 {
+    this->levels = levels;
 }
 
 /** 
