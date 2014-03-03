@@ -11,15 +11,15 @@
 #include <QProgressDialog>
 #include <QLabel>
 #include <queue>
-#include "VideoProcessor.h"
-#include "EVMLyprIIRDialog.h"
-#include "EVMLyprIIRProcessor.h"
+#include "VideoPlayer.h"
+#include "LyprIIRDialog.h"
+#include "LyprIIRProcessor.h"
 #include "WindowHelper.h"
 #include <opencv2/core/core.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/highgui/highgui.hpp>
 
-class VideoProcessor;
+class VideoPlayer;
 
 namespace Ui {
 class MainWindow;
@@ -93,7 +93,7 @@ private slots:
 
     void closeProgressDialog();
 
-    void on_actionLapliacian_IIR_triggered();
+    void on_motion_triggered();
 
 protected:
     void closeEvent(QCloseEvent *);
@@ -105,9 +105,9 @@ private:
     QProgressDialog *progressDialog;
 
     // Laplacian IIR amplify dialog
-    EVMLyprIIRDialog *lyprIIRDialog;
+    LyprIIRDialog *lyprIIRDialog;
     // Laplacian IIR amplify processor
-    EVMLyprIIRProcessor *lyprIIRProcessor;
+    LyprIIRProcessor *lyprIIRProcessor;
 
     void updateStatus(bool vi);
     void updateTimeLabel();
@@ -122,7 +122,7 @@ private:
     QString curFile;
 
     // video processor instance
-    VideoProcessor *video;
+    VideoPlayer *video;
 
     // a window helper with some useful
     // functions e.g. sleep

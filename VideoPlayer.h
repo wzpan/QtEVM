@@ -14,13 +14,13 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <dbg.h>
 
-class VideoProcessor : public QObject {
+class VideoPlayer : public QObject {
 
     Q_OBJECT
 
 public:
 
-    explicit VideoProcessor(QObject *parent = 0);
+    explicit VideoPlayer(QObject *parent = 0);
 
     // Is the player playing?
     bool isPlay();
@@ -120,7 +120,7 @@ public:
     void close();
 
     // process the frames of the sequence
-    void runProcess();
+    void processFrame();
 
     // write the processed result
     void writeOutput();

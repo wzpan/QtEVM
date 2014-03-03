@@ -185,7 +185,8 @@
     <property name="title">
      <string>Magnification(&amp;M)</string>
     </property>
-    <addaction name="actionLapliacian_IIR"/>
+    <addaction name="motion"/>
+    <addaction name="color"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
@@ -366,9 +367,14 @@
     <string>Clean Temp Files</string>
    </property>
   </action>
-  <action name="actionLapliacian_IIR">
+  <action name="motion">
    <property name="text">
-    <string>&amp;Lapliacian IIR</string>
+    <string>&amp;Motion</string>
+   </property>
+  </action>
+  <action name="color">
+   <property name="text">
+    <string>&amp;Color</string>
    </property>
   </action>
  </widget>

@@ -25,7 +25,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     updateStatus(false);
 
-    video = new VideoProcessor;
+    video = new VideoPlayer;
 
     connect(video, SIGNAL(showFrame(cv::Mat)), this, SLOT(showFrame(cv::Mat)));
     connect(video, SIGNAL(sleep(int)), this, SLOT(sleep(int)));
@@ -256,7 +256,7 @@ void MainWindow::process()
     QApplication::setOverrideCursor(Qt::WaitCursor);
 
     // run the process
-    video->runProcess();
+    video->processFrame();
 
     // restore the cursor
     QApplication::restoreOverrideCursor();
@@ -499,15 +499,16 @@ void MainWindow::on_actionClean_Temp_Files_triggered()
     }
 }
 
-void MainWindow::on_actionLapliacian_IIR_triggered()
+void MainWindow::on_motion_triggered()
 {
     if (!lyprIIRProcessor)
-        lyprIIRProcessor = new EVMLyprIIRProcessor();
+        lyprIIRProcessor = new LyprIIRProcessor();
+
     lyprIIRProcessor->reset();
 
     // show laplacian IIR dialog
     if (!lyprIIRDialog)
-        lyprIIRDialog = new EVMLyprIIRDialog(this, lyprIIRProcessor);
+        lyprIIRDialog = new LyprIIRDialog(this, lyprIIRProcessor);
 
     lyprIIRDialog->show();
     lyprIIRDialog->raise();

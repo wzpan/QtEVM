@@ -1,11 +1,11 @@
-#include "EVMLyprIIRDialog.h"
+#include "LyprIIRDialog.h"
 #include <string.h>
-#include "ui_EVMLyprIIRDialog.h"
+#include "ui_LyprIIRDialog.h"
 
-EVMLyprIIRDialog::EVMLyprIIRDialog(QWidget *parent,
-                                   EVMLyprIIRProcessor *processor) :
+LyprIIRDialog::LyprIIRDialog(QWidget *parent,
+                                   LyprIIRProcessor *processor) :
     QDialog(parent),
-    ui(new Ui::EVMLyprIIRDialog)
+    ui(new Ui::LyprIIRDialog)
 {
     this->processor = processor;
     ui->setupUi(this);
@@ -40,12 +40,12 @@ EVMLyprIIRDialog::EVMLyprIIRDialog(QWidget *parent,
     ui->chromLabel->setText(QString::fromStdString(ss.str()));
 }
 
-EVMLyprIIRDialog::~EVMLyprIIRDialog()
+LyprIIRDialog::~LyprIIRDialog()
 {
     delete ui;
 }
 
-void EVMLyprIIRDialog::on_alphaSlider_valueChanged(int value)
+void LyprIIRDialog::on_alphaSlider_valueChanged(int value)
 {
     processor->alpha = value;
     std::stringstream ss;
@@ -53,7 +53,7 @@ void EVMLyprIIRDialog::on_alphaSlider_valueChanged(int value)
     ui->alphaLabel->setText(QString::fromStdString(ss.str()));
 }
 
-void EVMLyprIIRDialog::on_lambdaSlider_valueChanged(int value)
+void LyprIIRDialog::on_lambdaSlider_valueChanged(int value)
 {
     processor->lambda_c = value;
     std::stringstream ss;
@@ -61,7 +61,7 @@ void EVMLyprIIRDialog::on_lambdaSlider_valueChanged(int value)
     ui->lambdaLabel->setText(QString::fromStdString(ss.str()));
 }
 
-void EVMLyprIIRDialog::on_r1Slider_valueChanged(int value)
+void LyprIIRDialog::on_r1Slider_valueChanged(int value)
 {
     processor->r1 = value / 100.0;
     std::stringstream ss;
@@ -69,7 +69,7 @@ void EVMLyprIIRDialog::on_r1Slider_valueChanged(int value)
     ui->r1Label->setText(QString::fromStdString(ss.str()));
 }
 
-void EVMLyprIIRDialog::on_r2Slider_valueChanged(int value)
+void LyprIIRDialog::on_r2Slider_valueChanged(int value)
 {
     processor->r2 = value / 100.0;
     std::stringstream ss;
@@ -77,7 +77,7 @@ void EVMLyprIIRDialog::on_r2Slider_valueChanged(int value)
     ui->r2Label->setText(QString::fromStdString(ss.str()));
 }
 
-void EVMLyprIIRDialog::on_chromSlider_valueChanged(int value)
+void LyprIIRDialog::on_chromSlider_valueChanged(int value)
 {
     processor->chromAttenuation = value / 10.0;
     std::stringstream ss;

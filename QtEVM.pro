@@ -13,22 +13,27 @@ TEMPLATE = app
 
 SOURCES += main.cpp\
         mainwindow.cpp \
-    VideoProcessor.cpp \
     WindowHelper.cpp \
-    EVMLyprIIRProcessor.cpp \
     Utils.cpp \
-    EVMLyprIIRDialog.cpp
+    VideoPlayer.cpp \
+    LyprIIRDialog.cpp \
+    LyprIIRProcessor.cpp \
+    GdownIdealDialog.cpp \
+    GdownIdealProcessor.cpp
 
 HEADERS  += mainwindow.h \
     FrameProcessor.h \
-    VideoProcessor.h \
     WindowHelper.h \
-    EVMLyprIIRProcessor.h \
     Utils.h \
-    EVMLyprIIRDialog.h
+    VideoPlayer.h \
+    LyprIIRProcessor.h \
+    LyprIIRDialog.h \
+    GdownIdealDialog.h \
+    GdownIdealProcessor.h
 
 FORMS    += mainwindow.ui \
-    EVMLyprIIRDialog.ui
+    LyprIIRDialog.ui \
+    GdownIdealDialog.ui
 
 RESOURCES += \
     myResources.qrc

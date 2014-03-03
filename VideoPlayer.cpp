@@ -1,6 +1,6 @@
-#include "VideoProcessor.h"
+#include "VideoPlayer.h"
 
-VideoProcessor::VideoProcessor(QObject *parent) : QObject(parent)
+VideoPlayer::VideoPlayer(QObject *parent) : QObject(parent)
 {
     delay = -1;
     fnumber = 0;
@@ -22,7 +22,7 @@ VideoProcessor::VideoProcessor(QObject *parent) : QObject(parent)
  *
  * @param frame	-	frame number to stop
  */
-void VideoProcessor::stopAtFrameNo(long frame)
+void VideoPlayer::stopAtFrameNo(long frame)
 {
     frameToStop = frame;
 }
@@ -35,7 +35,7 @@ void VideoProcessor::stopAtFrameNo(long frame)
  * negative means no delay
  * @param d	-	delay param
  */
-void VideoProcessor::setDelay(int d)
+void VideoPlayer::setDelay(int d)
 {
     delay = d;
 }
@@ -46,7 +46,7 @@ void VideoProcessor::setDelay(int d)
  *
  * @return the number of processed frames
  */
-long VideoProcessor::getNumberOfProcessedFrames()
+long VideoPlayer::getNumberOfProcessedFrames()
 {
     return fnumber;
 }
@@ -56,7 +56,7 @@ long VideoProcessor::getNumberOfProcessedFrames()
  *
  * @return the number of played frames
  */
-long VideoProcessor::getNumberOfPlayedFrames()
+long VideoPlayer::getNumberOfPlayedFrames()
 {
     return curPos;
 }
@@ -67,7 +67,7 @@ long VideoProcessor::getNumberOfPlayedFrames()
  *
  * @return the size of the video frame
  */
-cv::Size VideoProcessor::getFrameSize()
+cv::Size VideoPlayer::getFrameSize()
 {
     int w = static_cast<int>(capture.get(CV_CAP_PROP_FRAME_WIDTH));
     int h = static_cast<int>(capture.get(CV_CAP_PROP_FRAME_HEIGHT));
@@ -81,7 +81,7 @@ cv::Size VideoProcessor::getFrameSize()
  *
  * @return the frame number of the next frame
  */
-long VideoProcessor::getFrameNumber()
+long VideoPlayer::getFrameNumber()
 {
     long f = static_cast<long>(capture.get(CV_CAP_PROP_POS_FRAMES));
 
@@ -93,7 +93,7 @@ long VideoProcessor::getFrameNumber()
  *
  * @return the position in milliseconds
  */
-double VideoProcessor::getPositionMS()
+double VideoPlayer::getPositionMS()
 {
     double t = capture.get(CV_CAP_PROP_POS_MSEC);
 
@@ -106,7 +106,7 @@ double VideoProcessor::getPositionMS()
  *
  * @return the frame rate
  */
-double VideoProcessor::getFrameRate()
+double VideoPlayer::getFrameRate()
 {
     double r = capture.get(CV_CAP_PROP_FPS);
 
@@ -118,7 +118,7 @@ double VideoProcessor::getFrameRate()
  *
  * @return the number of frames
  */
-long VideoProcessor::getLength()
+long VideoPlayer::getLength()
 {
     return length;
 }
@@ -130,7 +130,7 @@ long VideoProcessor::getLength()
  *
  * @return the length of length in milliseconds
  */
-double VideoProcessor::getLengthMS()
+double VideoPlayer::getLengthMS()
 {
     double l = 1000.0 * length / rate;
     return l;
@@ -142,7 +142,7 @@ double VideoProcessor::getLengthMS()
  * normally doesn't need it unless getLength()
  * can't return a valid value
  */
-void VideoProcessor::calculateLength()
+void VideoPlayer::calculateLength()
 {
     long l = 0;
     cv::Mat img;
@@ -161,7 +161,7 @@ void VideoProcessor::calculateLength()
  *
  * @return the codec integer
  */
-int VideoProcessor::getCodec(char codec[])
+int VideoPlayer::getCodec(char codec[])
 {
     union {
         int value;
@@ -183,7 +183,7 @@ int VideoProcessor::getCodec(char codec[])
  *
  * @param str	-	the reference of the output string
  */
-void VideoProcessor::getTempFile(std::string &str)
+void VideoPlayer::getTempFile(std::string &str)
 {
     if (!tempFileList.empty()){
         str = tempFileList.back();
@@ -198,7 +198,7 @@ void VideoProcessor::getTempFile(std::string &str)
  *
  * @param str	-	the reference of the output string
  */
-void VideoProcessor::getCurTempFile(std::string &str)
+void VideoPlayer::getCurTempFile(std::string &str)
 {
     str = tempFile;
 }
@@ -210,7 +210,7 @@ void VideoProcessor::getCurTempFile(std::string &str)
  *
  * @return True if success. False otherwise
  */
-bool VideoProcessor::setInput(const std::string &fileName)
+bool VideoPlayer::setInput(const std::string &fileName)
 {
     fnumber = 0;
     tempFile = fileName;
@@ -247,7 +247,7 @@ bool VideoProcessor::setInput(const std::string &fileName)
  *
  * @return True if successful. False otherwise
  */
-bool VideoProcessor::setOutput(const std::string &filename, int codec, double framerate, bool isColor)
+bool VideoPlayer::setOutput(const std::string &filename, int codec, double framerate, bool isColor)
 {
     outputFile = filename;
     extension.clear();
@@ -281,7 +281,7 @@ bool VideoProcessor::setOutput(const std::string &filename, int codec, double fr
  *
  * @return True if successful. False otherwise
  */
-bool VideoProcessor::setOutput(const std::string &filename, const std::string &ext, int numberOfDigits, int startIndex)
+bool VideoPlayer::setOutput(const std::string &filename, const std::string &ext, int numberOfDigits, int startIndex)
 {
     // number of digits must be positive
     if (numberOfDigits<0)
@@ -310,7 +310,7 @@ bool VideoProcessor::setOutput(const std::string &filename, const std::string &e
  *
  * @return True if successful. False otherwise
  */
-bool VideoProcessor::createTemp(double framerate, bool isColor)
+bool VideoPlayer::createTemp(double framerate, bool isColor)
 {
     std::stringstream ss;
     ss << "temp_" << QDateTime::currentDateTime().toTime_t() << ".avi";
@@ -334,7 +334,7 @@ bool VideoProcessor::createTemp(double framerate, bool isColor)
  *
  * @param frameProcessingCallback	-	callback function for processing
  */
-void VideoProcessor::setFrameProcessor(void (*frameProcessingCallback)(cv::Mat&, cv::Mat&))
+void VideoPlayer::setFrameProcessor(void (*frameProcessingCallback)(cv::Mat&, cv::Mat&))
 {
     // invalidate frame processor class instance
     frameProcessor = 0;
@@ -347,7 +347,7 @@ void VideoProcessor::setFrameProcessor(void (*frameProcessingCallback)(cv::Mat&,
  *
  * @param frameProcessorPtr -	the instance of the class that implements the FrameProcessor interface
  */
-void VideoProcessor::setFrameProcessor(FrameProcessor *frameProcessorPtr)
+void VideoPlayer::setFrameProcessor(FrameProcessor *frameProcessorPtr)
 {
     // invalidate callback function
     process = 0;
@@ -359,7 +359,7 @@ void VideoProcessor::setFrameProcessor(FrameProcessor *frameProcessorPtr)
  * stopIt	-	stop playing
  *
  */
-void VideoProcessor::stopIt()
+void VideoPlayer::stopIt()
 {
     play = false;
     emit revert();
@@ -369,7 +369,7 @@ void VideoProcessor::stopIt()
  * prevFrame	-	display the prev frame of the sequence
  *
  */
-void VideoProcessor::prevFrame()
+void VideoPlayer::prevFrame()
 {
     if(isPlay())
         pauseIt();
@@ -384,7 +384,7 @@ void VideoProcessor::prevFrame()
  * nextFrame	-	display the next frame of the sequence
  *
  */
-void VideoProcessor::nextFrame()
+void VideoPlayer::nextFrame()
 {
     if(isPlay())
         pauseIt();
@@ -403,7 +403,7 @@ void VideoProcessor::nextFrame()
  *
  * @return True if success. False otherwise
  */
-bool VideoProcessor::jumpTo(long index)
+bool VideoPlayer::jumpTo(long index)
 {
     if (index >= length){
         return 1;
@@ -429,7 +429,7 @@ bool VideoProcessor::jumpTo(long index)
  * @return True if success. False otherwise
  *
  */
-bool VideoProcessor::jumpToMS(double pos)
+bool VideoPlayer::jumpToMS(double pos)
 {
     return capture.set(CV_CAP_PROP_POS_MSEC, pos);
 }
@@ -439,7 +439,7 @@ bool VideoProcessor::jumpToMS(double pos)
  * close	-	close the video
  *
  */
-void VideoProcessor::close()
+void VideoPlayer::close()
 {
     rate = 0;
     length = 0;
@@ -455,7 +455,7 @@ void VideoProcessor::close()
  *
  * @return True if playing. False otherwise
  */
-bool VideoProcessor::isPlay()
+bool VideoPlayer::isPlay()
 {
     return play;
 }
@@ -466,7 +466,7 @@ bool VideoProcessor::isPlay()
  *
  * @return True if modified. False otherwise
  */
-bool VideoProcessor::isModified()
+bool VideoPlayer::isModified()
 {
     return modify;
 }
@@ -477,7 +477,7 @@ bool VideoProcessor::isModified()
  *
  * @return True if opened. False otherwise 
  */
-bool VideoProcessor::isOpened()
+bool VideoPlayer::isOpened()
 {
     return capture.isOpened();
 }
@@ -489,7 +489,7 @@ bool VideoProcessor::isOpened()
  *
  * @return True if success. False otherwise
  */
-bool VideoProcessor::getNextFrame(cv::Mat &frame)
+bool VideoPlayer::getNextFrame(cv::Mat &frame)
 {
     return capture.read(frame);
 }
@@ -499,7 +499,7 @@ bool VideoProcessor::getNextFrame(cv::Mat &frame)
  *
  * @param frame	-	the frame to be written
  */
-void VideoProcessor::writeNextFrame(cv::Mat &frame)
+void VideoPlayer::writeNextFrame(cv::Mat &frame)
 {
     if (extension.length()) { // then we write images
 
@@ -517,7 +517,7 @@ void VideoProcessor::writeNextFrame(cv::Mat &frame)
  * playIt	-	play the frames of the sequence
  *
  */
-void VideoProcessor::playIt()
+void VideoPlayer::playIt()
 {
     // current frame
     cv::Mat input;
@@ -562,7 +562,7 @@ void VideoProcessor::playIt()
  * pauseIt	-	pause playing
  *
  */
-void VideoProcessor::pauseIt()
+void VideoPlayer::pauseIt()
 {
     play = false;
     emit updateBtn();
@@ -572,7 +572,7 @@ void VideoProcessor::pauseIt()
  * runProcess	-	process the frames of the sequence
  *
  */
-void VideoProcessor::runProcess()
+void VideoPlayer::processFrame()
 {
     // create a temp file
     createTemp();
@@ -628,7 +628,7 @@ void VideoProcessor::runProcess()
  * writeOutput	-	write the processed result
  *
  */
-void VideoProcessor::writeOutput()
+void VideoPlayer::writeOutput()
 {
     cv::Mat input;
 
@@ -663,7 +663,7 @@ void VideoProcessor::writeOutput()
  * revertVideo	-	revert playing
  *
  */
-void VideoProcessor::revertVideo()
+void VideoPlayer::revertVideo()
 {
     // pause the video
     jumpTo(0);    

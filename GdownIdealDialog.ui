@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>EVMLyprIIRDialog</class>
- <widget class="QDialog" name="EVMLyprIIRDialog">
+ <class>GdownIdealDialog</class>
+ <widget class="QDialog" name="GdownIdealDialog">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>504</width>
-    <height>255</height>
+    <width>500</width>
+    <height>260</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Laplacian IIR</string>
+   <string>Dialog</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
    <item row="0" column="0">
@@ -96,7 +96,7 @@
              </sizepolicy>
             </property>
             <property name="text">
-             <string>r1 (High cut-off?):</string>
+             <string>Low cut-off:</string>
             </property>
             <property name="alignment">
              <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
@@ -118,7 +118,7 @@
              <number>10</number>
             </property>
             <property name="value">
-             <number>40</number>
+             <number>23</number>
             </property>
             <property name="orientation">
              <enum>Qt::Horizontal</enum>
@@ -141,7 +141,7 @@
              </sizepolicy>
             </property>
             <property name="text">
-             <string>r2 (Low cut-off?):</string>
+             <string>High cut-off:</string>
             </property>
             <property name="alignment">
              <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
@@ -160,7 +160,7 @@
              <number>100</number>
             </property>
             <property name="value">
-             <number>5</number>
+             <number>26</number>
             </property>
             <property name="orientation">
              <enum>Qt::Horizontal</enum>
@@ -267,38 +267,5 @@
   </layout>
  </widget>
  <resources/>
- <connections>
-  <connection>
-   <sender>okButton</sender>
-   <signal>clicked()</signal>
-   <receiver>EVMLyprIIRDialog</receiver>
-   <slot>accept()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>361</x>
-     <y>226</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>288</x>
-     <y>203</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>cancelButton</sender>
-   <signal>clicked()</signal>
-   <receiver>EVMLyprIIRDialog</receiver>
-   <slot>reject()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>463</x>
-     <y>225</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>495</x>
-     <y>204</y>
-    </hint>
-   </hints>
-  </connection>
- </connections>
+ <connections/>
 </ui>

@@ -1,21 +1,21 @@
-#ifndef EVMLYPRIIRDIALOG_H
-#define EVMLYPRIIRDIALOG_H
+#ifndef LYPRIIRDIALOG_H
+#define LYPRIIRDIALOG_H
 
 #include <QDialog>
-#include "EVMLyprIIRProcessor.h"
+#include "LyprIIRProcessor.h"
 
 namespace Ui {
-class EVMLyprIIRDialog;
+class LyprIIRDialog;
 }
 
-class EVMLyprIIRDialog : public QDialog
+class LyprIIRDialog : public QDialog
 {
     Q_OBJECT
 
 public:
-    explicit EVMLyprIIRDialog(QWidget *parent = 0,
-                           EVMLyprIIRProcessor *processor = 0);
-    ~EVMLyprIIRDialog();
+    explicit LyprIIRDialog(QWidget *parent = 0,
+                           LyprIIRProcessor *processor = 0);
+    ~LyprIIRDialog();
 
 private slots:
     void on_alphaSlider_valueChanged(int value);
@@ -29,9 +29,9 @@ private slots:
     void on_chromSlider_valueChanged(int value);
 
 private:
-    Ui::EVMLyprIIRDialog *ui;
-    EVMLyprIIRProcessor *processor;
+    Ui::LyprIIRDialog *ui;
+    LyprIIRProcessor *processor;
     QString alphaStr, lambdaStr, r1Str, r2Str, chromStr;
 };
 
-#endif // EVMLYPRIIRDIALOG_H
+#endif // LYPRIIRDIALOG_H

@@ -10,9 +10,9 @@
  */
 
 
-#include "EVMLyprIIRProcessor.h"
+#include "LyprIIRProcessor.h"
 
-EVMLyprIIRProcessor::EVMLyprIIRProcessor()
+LyprIIRProcessor::LyprIIRProcessor()
     : levels(6)
     , is_not_first_frame(false)
     , alpha(10)
@@ -29,16 +29,14 @@ EVMLyprIIRProcessor::EVMLyprIIRProcessor()
  * @param img	-	input image
  * @param out	-	output image
  */
-void EVMLyprIIRProcessor :: process(cv::Mat &img, cv::Mat &out)
+void LyprIIRProcessor :: process(const cv::Mat &img, cv::Mat &out)
 {
     cv::Mat mat32f;
     img.convertTo(mat32f, CV_32F, 1.0/255.0);
-    amplify_spatial_lpyr_temporal_iir(mat32f, lapPyr, out, alpha,
-                                          lambda_c, r1, r2, chromAttenuation);
-
+    amplify_spatial_lpyr_temporal_iir(mat32f, out);
 }
 
-void EVMLyprIIRProcessor::reset()
+void LyprIIRProcessor::reset()
 {
     is_not_first_frame = false;
 }
@@ -56,22 +54,10 @@ void EVMLyprIIRProcessor::reset()
  * y[n] = y1[n] - y2[n]
  *
  * @param src		-	source image
- * @param lapPyr	-	laplacian pyramid
  * @param dst		-	output image
- * @param alpha		-	amplification factor
- * @param lambda_c	-	cut-off Wavelength
- * @param r1		-	r1
- * @param r2		-	r2
- * @param chromAttenuation	- chromAttenuation
  */
-void EVMLyprIIRProcessor::amplify_spatial_lpyr_temporal_iir(const cv::Mat &src,
-                                                            std::vector<cv::Mat_<cv::Vec3f> > &lapPyr,
-                                                            cv::Mat &dst,
-                                                            float alpha,
-                                                            float lambda_c,
-                                                            float r1,
-                                                            float r2,
-                                                            float chromAttenuation)
+void LyprIIRProcessor::amplify_spatial_lpyr_temporal_iir(const cv::Mat &src,
+                                                            cv::Mat &dst)
 {
     cv::Mat_<cv::Vec3f> s = src.clone();
     rgb2ntsc(src, s);
@@ -122,7 +108,7 @@ void EVMLyprIIRProcessor::amplify_spatial_lpyr_temporal_iir(const cv::Mat &src,
  * @param alpha -	amplification factor
  * @param lambda_c	-	cut-off Wavelength
  */
-void EVMLyprIIRProcessor::amplifyByAlpha(const cv::Mat &src, float alpha, float lambda_c)
+void LyprIIRProcessor::amplifyByAlpha(const cv::Mat &src, float alpha, float lambda_c)
 {
     int w = src.cols;
     int h = src.rows;
@@ -163,7 +149,7 @@ void EVMLyprIIRProcessor::amplifyByAlpha(const cv::Mat &src, float alpha, float 
  * @param img		-	source image
  * @param lapPyr	-	output laplacian pyramid
  */
-void EVMLyprIIRProcessor::buildLaplacianPyramid(const cv::Mat &img,
+void LyprIIRProcessor::buildLaplacianPyramid(const cv::Mat &img,
                                                 std::vector<cv::Mat_<cv::Vec3f> > &lapPyr)
 {
     lapPyr.clear();
@@ -186,7 +172,7 @@ void EVMLyprIIRProcessor::buildLaplacianPyramid(const cv::Mat &img,
  *
  * @return	-	output image
  */
-cv::Mat_<cv::Vec3f> EVMLyprIIRProcessor::reconstructImgFromLapPyramid(
+cv::Mat_<cv::Vec3f> LyprIIRProcessor::reconstructImgFromLapPyramid(
     std::vector<cv::Mat_<cv::Vec3f> > &lapPyr)
 {
     cv::Mat currentImg = lapPyr[levels];

@@ -18,4 +18,4 @@ More info: http://people.csail.mit.edu/mrub/vidmag/
 
 ## Credits ##
 
-The core functions in `EVMLyprIIRProcessor` class are mostly adopted from [yusuketomoto/ofxEvm](https://github.com/yusuketomoto/ofxEvm).
+The core functions in `LyprIIRProcessor` class are mostly adopted from [yusuketomoto/ofxEvm](https://github.com/yusuketomoto/ofxEvm).
