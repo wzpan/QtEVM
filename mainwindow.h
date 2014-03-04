@@ -11,15 +11,14 @@
 #include <QProgressDialog>
 #include <QLabel>
 #include <queue>
-#include "VideoPlayer.h"
-#include "LyprIIRDialog.h"
-#include "LyprIIRProcessor.h"
+#include "VideoProcessor.h"
+#include "ParamDialog.h"
 #include "WindowHelper.h"
 #include <opencv2/core/core.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/highgui/highgui.hpp>
 
-class VideoPlayer;
+class VideoProcessor;
 
 namespace Ui {
 class MainWindow;
@@ -40,7 +39,7 @@ public:
     bool saveAs();      // save as
     bool saveFile(const QString &fileName);     // save file
     bool LoadFile(const QString &fileName);    // load file
-    void process();     // process
+    void magnification();     // process
 
     // Help functions
     void about();
@@ -107,9 +106,7 @@ private:
     QProgressDialog *progressDialog;
 
     // Laplacian IIR amplify dialog
-    LyprIIRDialog *lyprIIRDialog;
-    // Laplacian IIR amplify processor
-    LyprIIRProcessor *lyprIIRProcessor;
+    ParamDialog *paramDialog;
 
     void updateStatus(bool vi);
     void updateTimeLabel();
@@ -124,7 +121,7 @@ private:
     QString curFile;
 
     // video processor instance
-    VideoPlayer *video;
+    VideoProcessor *video;
 
     // a window helper with some useful
     // functions e.g. sleep

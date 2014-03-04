@@ -20,12 +20,11 @@ MainWindow::MainWindow(QWidget *parent) :
     progressDialog =  0;
 
     // Laplacian IIR amplify
-    lyprIIRDialog = 0;
-    lyprIIRProcessor = 0;
+    paramDialog = 0;
 
     updateStatus(false);
 
-    video = new VideoPlayer;
+    video = new VideoProcessor;
 
     connect(video, SIGNAL(showFrame(cv::Mat)), this, SLOT(showFrame(cv::Mat)));
     connect(video, SIGNAL(sleep(int)), this, SLOT(sleep(int)));
@@ -250,13 +249,13 @@ bool MainWindow::LoadFile(const QString &fileName)
     return true;
 }
 
-void MainWindow::process()
+void MainWindow::magnification()
 {
     // change the cursor
     QApplication::setOverrideCursor(Qt::WaitCursor);
 
     // run the process
-    video->processFrame();
+    video->magnify();
 
     // restore the cursor
     QApplication::restoreOverrideCursor();
@@ -307,11 +306,11 @@ void MainWindow::sleep(int msecs)
  */
 void MainWindow::updateBtn()
 {
-    bool isPlay = video->isPlay();
-    ui->actionPause->setVisible(isPlay);
-    ui->btnPause->setVisible(isPlay);
-    ui->actionPlay->setVisible(!isPlay);
-    ui->btnPlay->setVisible(!isPlay);
+    bool isStop = video->isStop();
+    ui->actionPause->setVisible(!isStop);
+    ui->btnPause->setVisible(!isStop);
+    ui->actionPlay->setVisible(isStop);
+    ui->btnPlay->setVisible(isStop);
 }
 
 /** 
@@ -342,10 +341,13 @@ void MainWindow::updateProcessProgress(int value)
         progressDialog->setRange(0, 100);
         progressDialog->setModal(true);
     }
-    progressDialog->setValue(value);
-    progressDialog->setCancelButton(0);
+    progressDialog->setValue(value + 1);
+    // progressDialog->setCancelButton(0);
+    progressDialog->setCancelButtonText(tr("cancel"));
     qApp->processEvents();
-
+    if (progressDialog->wasCanceled()){
+        video->stopIt();
+    }
 }
 
 /**
@@ -354,11 +356,17 @@ void MainWindow::updateProcessProgress(int value)
  */
 void MainWindow::about()
 {
-    QMessageBox::about(this, tr("About VideoPlayer"),
-                       tr("<h2>VideoPlayer 1.0</h2>"
-                          "<p>Copyright &copy; 2013 Software Inc.</p>"
-                          "<p>VideoPlayer is a small application to "
-                          "play and process videos.</p>"));
+    QMessageBox::about(this, tr("About QtEVM"),
+                       tr("<h2>QtEVM 1.0</h2>"
+                          "<p>Copyright &copy; 2014 Joseph Pan"
+                          "(<a href=\"mailto:cs.wzpan@gmail.com\">"
+                          "<span style=\" text-decoration: underline; color:#0000ff;\">"
+                          "cs.wzpan@gmail.com</span></a>).</p>"
+                          "<p>Yet anther C++ implementation of EVM"
+                          "(<a href=\"http://people.csail.mit.edu/mrub/vidmag/\">"
+                          "<span style=\" text-decoration: underline; color:#0000ff;\">"
+                          "Eulerian Video Magnification</span></a>)"
+                          ", based on OpenCV and Qt.</p>"));
 }
 
 // Open video file
@@ -501,28 +509,38 @@ void MainWindow::on_actionClean_Temp_Files_triggered()
 
 void MainWindow::on_motion_triggered()
 {
-    if (!lyprIIRProcessor)
-        lyprIIRProcessor = new LyprIIRProcessor();
-
-    lyprIIRProcessor->reset();
-
     // show laplacian IIR dialog
-    if (!lyprIIRDialog)
-        lyprIIRDialog = new LyprIIRDialog(this, lyprIIRProcessor);
+    if (!paramDialog)
+        paramDialog = new ParamDialog(this, video);
 
-    lyprIIRDialog->show();
-    lyprIIRDialog->raise();
-    lyprIIRDialog->activateWindow();
+    paramDialog->show();
+    paramDialog->raise();
+    paramDialog->activateWindow();
 
-    if (lyprIIRDialog->exec() == QDialog::Accepted) {
-        // set laplacian IIR motion magnification processor as the current frame processor
-        video->setFrameProcessor(lyprIIRProcessor);
-        // do process
-        process();
+    if (paramDialog->exec() == QDialog::Accepted) {
+        // set laplacian pyramid as spatial filter
+        video->setSpatialFilter(LAPLACIAN);
+        // set IIR filter as temporal filter
+        video->setTemporalFilter(IIR);
+        magnification();
     }
 }
 
 void MainWindow::on_color_triggered()
 {
+    // show laplacian IIR dialog
+    if (!paramDialog)
+        paramDialog = new ParamDialog(this, video);
 
+    paramDialog->show();
+    paramDialog->raise();
+    paramDialog->activateWindow();
+
+    if (paramDialog->exec() == QDialog::Accepted) {
+        // set gaussian pyramid as spatial filter
+        video->setSpatialFilter(GAUSSIAN);
+        // set ideal filter as temporal filter
+        video->setTemporalFilter(IDEAL);
+        magnification();
+    }
 }

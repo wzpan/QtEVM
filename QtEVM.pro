@@ -15,23 +15,17 @@ SOURCES += main.cpp\
         mainwindow.cpp \
     WindowHelper.cpp \
     Utils.cpp \
-    VideoPlayer.cpp \
-    LyprIIRDialog.cpp \
-    LyprIIRProcessor.cpp \
-    GdownIdealDialog.cpp
+    VideoProcessor.cpp \
+    ParamDialog.cpp
 
 HEADERS  += mainwindow.h \
-    FrameProcessor.h \
     WindowHelper.h \
     Utils.h \
-    VideoPlayer.h \
-    LyprIIRProcessor.h \
-    LyprIIRDialog.h \
-    GdownIdealDialog.h
+    VideoProcessor.h \
+    ParamDialog.h
 
 FORMS    += mainwindow.ui \
-    LyprIIRDialog.ui \
-    GdownIdealDialog.ui
+    ParamDialog.ui
 
 RESOURCES += \
     myResources.qrc

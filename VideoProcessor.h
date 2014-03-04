@@ -9,21 +9,26 @@
 #include <QObject>
 #include <QDateTime>
 #include <vector>
-#include "FrameProcessor.h"
 #include <opencv2/core/core.hpp>
+#include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/highgui/highgui.hpp>
-#include <dbg.h>
+#include "Utils.h"
 
-class VideoPlayer : public QObject {
+enum spatialFilterType {LAPLACIAN, GAUSSIAN};
+enum temporalFilterType {IIR, IDEAL};
+
+class VideoProcessor : public QObject {
 
     Q_OBJECT
 
+    friend class ParamDialog;
+
 public:
 
-    explicit VideoPlayer(QObject *parent = 0);
+    explicit VideoProcessor(QObject *parent = 0);
 
     // Is the player playing?
-    bool isPlay();
+    bool isStop();
 
     // Is the video modified?
     bool isModified();
@@ -92,11 +97,11 @@ public:
                    int numberOfDigits=3,   // number of digits
                    int startIndex=0);       // start index
 
-    // set the callback function that will be called for each frame
-    void setFrameProcessor(void (*frameProcessingCallback)(cv::Mat&, cv::Mat&));
+    // set spatial filter
+    void setSpatialFilter(spatialFilterType type);
 
-    // set the instance of the class that implements the FrameProcessor interface
-    void setFrameProcessor(FrameProcessor* frameProcessorPtr);
+    // set temporal filter
+    void setTemporalFilter(temporalFilterType type);
 
     // play the frames of the sequence
     void playIt();
@@ -122,8 +127,8 @@ public:
     // close the video
     void close();
 
-    // process the frames of the sequence
-    void processFrame();
+    // eulerian magnification
+    void magnify();
 
     // write the processed result
     void writeOutput();
@@ -146,12 +151,6 @@ private:
     // the OpenCV video capture object
     cv::VideoCapture capture;
 
-    // the callback function to be called
-    // for the processing of each frame
-    void (*process)(cv::Mat&, cv::Mat&);
-    // the pointer to the class implementing
-    // the FrameProcessor interface
-    FrameProcessor *frameProcessor;
     // delay between each frame processing
     int delay;
     // video frame rate
@@ -163,11 +162,33 @@ private:
     // stop at this frame number
     long frameToStop;
     // to stop the player
-    bool play;
+    bool stop;
     // is the video modified
     bool modify;
     // the current playing pos
     long curPos;
+    // current index for output images
+    int currentIndex;
+    // number of digits in output image filename
+    int digits;
+    // extension of output images
+    std::string extension;
+    // spatial filter type
+    spatialFilterType spatialType;
+    // temporal filter type
+    temporalFilterType temporalType;
+    // level numbers of image pyramid
+    int levels;
+    // amplification factor
+    float alpha;
+    // cut-off wave length
+    float lambda_c;
+    // low cut-off
+    float fl;
+    // high cut-off
+    float fh;
+    // chromAttenuation
+    float chromAttenuation;
 
     // the OpenCV video writer object
     cv::VideoWriter writer;
@@ -180,12 +201,14 @@ private:
     // all temp files queue
     std::vector<std::string> tempFileList;
 
-    // current index for output images
-    int currentIndex;
-    // number of digits in output image filename
-    int digits;
-    // extension of output images
-    std::string extension;
+    // low pass filters for IIR
+    std::vector<cv::Mat_<cv::Vec3f> > lowpass1;
+    std::vector<cv::Mat_<cv::Vec3f> > lowpass2;
+
+    // recalculate the number of frames in video
+    // normally doesn't need it unless getLength()
+    // can't return a valid value
+    void calculateLength();
 
     // get the next frame if any
     bool getNextFrame(cv::Mat& frame);
@@ -197,11 +220,24 @@ private:
     // by default the same parameters to the input video
     bool createTemp(double framerate=0.0, bool isColor=true);
 
-    // recalculate the number of frames in video
-    // normally doesn't need it unless getLength()
-    // can't return a valid value
-    void calculateLength();
+    // spatial filtering
+    void spatialFilter(const cv::Mat &src, std::vector<cv::Mat_<cv::Vec3f> > &pyramid);
 
+    // temporal filtering
+    bool temporalFilter(std::vector<cv::Mat_<cv::Vec3f> > &pyramid,
+                        std::vector<cv::Mat_<cv::Vec3f> > &filtered);
+
+    // amplify motion
+    void amplify(std::vector<cv::Mat_<cv::Vec3f> > &filtered);
+
+    // build a laplacian pyramid
+    void buildLaplacianPyramid(const cv::Mat &img, std::vector<cv::Mat_<cv::Vec3f> > &lapPyr);
+
+    // reconstruct image from pyramid
+    void reconImgFromPyramid(std::vector<cv::Mat_<cv::Vec3f> > &pyramid, cv::Mat &dst);
+
+    // attenuate I, Q channels
+    void attenuate(cv::Mat_<cv::Vec3f> &image);
 };
 
 #endif // VIDEOPROCESSOR_H
