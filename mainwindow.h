@@ -39,7 +39,6 @@ public:
     bool saveAs();      // save as
     bool saveFile(const QString &fileName);     // save file
     bool LoadFile(const QString &fileName);    // load file
-    void magnification();     // process
 
     // Help functions
     void about();
@@ -86,7 +85,7 @@ private slots:
 
     void updateProgressBar();           // update progress bar
 
-    void updateProcessProgress(int value);  // update process progress
+    void updateProcessProgress(const std::string &message, int value);  // update process progress
 
     void on_progressSlider_sliderMoved(int position);
 

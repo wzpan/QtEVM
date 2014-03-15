@@ -16,13 +16,17 @@ SOURCES += main.cpp\
     WindowHelper.cpp \
     Utils.cpp \
     VideoProcessor.cpp \
-    ParamDialog.cpp
+    ParamDialog.cpp \
+    SpatialFilter.cpp \
+    TemporalFilter.cpp
 
 HEADERS  += mainwindow.h \
     WindowHelper.h \
     Utils.h \
     VideoProcessor.h \
-    ParamDialog.h
+    ParamDialog.h \
+    TemporalFilter.h \
+    SpatialFilter.h
 
 FORMS    += mainwindow.ui \
     ParamDialog.ui
@@ -32,7 +36,8 @@ RESOURCES += \
 
 unix {
     CONFIG += link_pkgconfig
-    PKGCONFIG += opencv
+    PKGCONFIG += opencv \
+                fftw3
 }
 Win32 {
 INCLUDEPATH += C:\OpenCV2.2\include\

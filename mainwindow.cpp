@@ -31,7 +31,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(video, SIGNAL(revert()), this, SLOT(revert()));
     connect(video, SIGNAL(updateBtn()), this, SLOT(updateBtn()));
     connect(video, SIGNAL(updateProgressBar()), this, SLOT(updateProgressBar()));
-    connect(video, SIGNAL(updateProcessProgress(int)), this, SLOT(updateProcessProgress(int)));
+    connect(video, SIGNAL(updateProcessProgress(std::string, int)), this, SLOT(updateProcessProgress(std::string, int)));
     connect(video, SIGNAL(closeProgressDialog()), this, SLOT(closeProgressDialog()));
 }
 
@@ -249,18 +249,6 @@ bool MainWindow::LoadFile(const QString &fileName)
     return true;
 }
 
-void MainWindow::magnification()
-{
-    // change the cursor
-    QApplication::setOverrideCursor(Qt::WaitCursor);
-
-    // run the process
-    video->magnify();
-
-    // restore the cursor
-    QApplication::restoreOverrideCursor();
-}
-
 
 /** 
  * showImage	-	show a image
@@ -333,17 +321,20 @@ void MainWindow::updateProgressBar()
  * updateProgressBar	-	update the process progress dialog
  *
  */
-void MainWindow::updateProcessProgress(int value)
+void MainWindow::updateProcessProgress(const std::string &message, int value)
 {
     if(!progressDialog){
         progressDialog = new QProgressDialog(this);
-        progressDialog->setLabelText("Processing, please wait...");
+        progressDialog->setLabelText(QString::fromStdString(message));
         progressDialog->setRange(0, 100);
         progressDialog->setModal(true);
     }
     progressDialog->setValue(value + 1);
     // progressDialog->setCancelButton(0);
-    progressDialog->setCancelButtonText(tr("cancel"));
+    progressDialog->setCancelButtonText(tr("Abort"));
+    progressDialog->show();
+    progressDialog->raise();
+    progressDialog->activateWindow();
     qApp->processEvents();
     if (progressDialog->wasCanceled()){
         video->stopIt();
@@ -518,11 +509,14 @@ void MainWindow::on_motion_triggered()
     paramDialog->activateWindow();
 
     if (paramDialog->exec() == QDialog::Accepted) {
-        // set laplacian pyramid as spatial filter
         video->setSpatialFilter(LAPLACIAN);
-        // set IIR filter as temporal filter
-        video->setTemporalFilter(IIR);
-        magnification();
+        video->setTemporalFilter(IIR);        
+        // change the cursor
+        QApplication::setOverrideCursor(Qt::WaitCursor);
+        // run the process
+        video->motionMagnify();
+        // restore the cursor
+        QApplication::restoreOverrideCursor();
     }
 }
 
@@ -536,11 +530,14 @@ void MainWindow::on_color_triggered()
     paramDialog->raise();
     paramDialog->activateWindow();
 
-    if (paramDialog->exec() == QDialog::Accepted) {
-        // set gaussian pyramid as spatial filter
+    if (paramDialog->exec() == QDialog::Accepted) {        
         video->setSpatialFilter(GAUSSIAN);
-        // set ideal filter as temporal filter
         video->setTemporalFilter(IDEAL);
-        magnification();
+        // change the cursor
+        QApplication::setOverrideCursor(Qt::WaitCursor);
+        // run the process
+        video->colorMagnify();
+        // restore the cursor
+        QApplication::restoreOverrideCursor();
     }
 }

@@ -41,7 +41,7 @@ ParamDialog::~ParamDialog()
 
 void ParamDialog::on_alphaSlider_valueChanged(int value)
 {
-    processor->alpha = value;
+    processor->alpha = value / 10.0;
     std::stringstream ss;
     ss << alphaStr.toStdString() << processor->alpha;
     ui->alphaLabel->setText(QString::fromStdString(ss.str()));

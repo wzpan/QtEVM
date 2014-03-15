@@ -12,6 +12,8 @@
 #include <opencv2/core/core.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/highgui/highgui.hpp>
+#include "SpatialFilter.h"
+#include "TemporalFilter.h"
 #include "Utils.h"
 
 enum spatialFilterType {LAPLACIAN, GAUSSIAN};
@@ -35,9 +37,6 @@ public:
 
     // Is the player opened?
     bool isOpened();
-
-    // stop streaming at this frame number
-    void stopAtFrameNo(long frame);
 
     // set a delay between each frame
     // 0 means wait at each frame
@@ -127,8 +126,11 @@ public:
     // close the video
     void close();
 
-    // eulerian magnification
-    void magnify();
+    // motion magnification
+    void motionMagnify();
+
+    // color magnification
+    void colorMagnify();
 
     // write the processed result
     void writeOutput();
@@ -143,7 +145,7 @@ signals:
     void updateBtn();
     void updateProgressBar();
     void reload(const std::string &);
-    void updateProcessProgress(int percent);
+    void updateProcessProgress(const std::string &message, int percent);
     void closeProgressDialog();
 
 private:    
@@ -159,8 +161,6 @@ private:
     long fnumber;
     // total number of frames
     long length;
-    // stop at this frame number
-    long frameToStop;
     // to stop the player
     bool stop;
     // is the video modified
@@ -168,7 +168,9 @@ private:
     // the current playing pos
     long curPos;
     // current index for output images
-    int currentIndex;
+    int curIndex;
+    // current level of pyramid
+    int curLevel;
     // number of digits in output image filename
     int digits;
     // extension of output images
@@ -182,14 +184,19 @@ private:
     // amplification factor
     float alpha;
     // cut-off wave length
-    float lambda_c;
+    float lambda_c;    
     // low cut-off
     float fl;
     // high cut-off
     float fh;
     // chromAttenuation
     float chromAttenuation;
-
+    // delta
+    float delta;
+    // extraggon factor
+    float exaggeration_factor;
+    // lambda
+    float lambda;
     // the OpenCV video writer object
     cv::VideoWriter writer;
     cv::VideoWriter tempWriter;
@@ -221,23 +228,30 @@ private:
     bool createTemp(double framerate=0.0, bool isColor=true);
 
     // spatial filtering
-    void spatialFilter(const cv::Mat &src, std::vector<cv::Mat_<cv::Vec3f> > &pyramid);
+    bool spatialFilter(const cv::Mat &src, std::vector<cv::Mat_<cv::Vec3f> > &pyramid);
 
     // temporal filtering
-    bool temporalFilter(std::vector<cv::Mat_<cv::Vec3f> > &pyramid,
-                        std::vector<cv::Mat_<cv::Vec3f> > &filtered);
+    void temporalFilter(const cv::Mat_<cv::Vec3f> &src,
+                        cv::Mat_<cv::Vec3f> &dst);
+
+    // temporal IIR filtering
+    void temporalIIRFilter(const cv::Mat_<cv::Vec3f> &src,
+                        cv::Mat_<cv::Vec3f> &dst);
+
+    // temporal ideal bandpass filtering
+    void temporalIdealFilter(const cv::Mat_<cv::Vec3f> &src,
+                             cv::Mat_<cv::Vec3f> &dst);
 
     // amplify motion
-    void amplify(std::vector<cv::Mat_<cv::Vec3f> > &filtered);
+    void amplify(cv::Mat_<cv::Vec3f> &image);
 
-    // build a laplacian pyramid
-    void buildLaplacianPyramid(const cv::Mat &img, std::vector<cv::Mat_<cv::Vec3f> > &lapPyr);
-
-    // reconstruct image from pyramid
-    void reconImgFromPyramid(std::vector<cv::Mat_<cv::Vec3f> > &pyramid, cv::Mat &dst);
+    // combine image and motion
+    void combineImageAndMotion(const cv::Mat src,
+                             const std::vector<cv::Mat_<cv::Vec3f> > &filtered,
+                             cv::Mat &dst);
 
     // attenuate I, Q channels
-    void attenuate(cv::Mat_<cv::Vec3f> &image);
+    void attenuate(cv::Mat_<cv::Vec3f> &image);    
 };
 
 #endif // VIDEOPROCESSOR_H
