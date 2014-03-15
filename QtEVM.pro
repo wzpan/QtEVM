@@ -14,11 +14,11 @@ TEMPLATE = app
 SOURCES += main.cpp\
         mainwindow.cpp \
     WindowHelper.cpp \
-    Utils.cpp \
     VideoProcessor.cpp \
     ParamDialog.cpp \
     SpatialFilter.cpp \
-    TemporalFilter.cpp
+    TemporalFilter.cpp \
+    Utils.cpp
 
 HEADERS  += mainwindow.h \
     WindowHelper.h \

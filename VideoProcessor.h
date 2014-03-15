@@ -172,7 +172,7 @@ private:
     // current level of pyramid
     int curLevel;
     // number of digits in output image filename
-    int digits;
+    int digits;    
     // extension of output images
     std::string extension;
     // spatial filter type
@@ -245,13 +245,14 @@ private:
     // amplify motion
     void amplify(cv::Mat_<cv::Vec3f> &image);
 
-    // combine image and motion
-    void combineImageAndMotion(const cv::Mat src,
-                             const std::vector<cv::Mat_<cv::Vec3f> > &filtered,
-                             cv::Mat &dst);
-
     // attenuate I, Q channels
-    void attenuate(cv::Mat_<cv::Vec3f> &image);    
+    void attenuate(cv::Mat &src, cv::Mat &dst);
+
+    // concat images into a large Mat
+    void concat(const std::vector<cv::Mat_<cv::Vec3f> > &frames, cv::Mat_<cv::Vec3f> &dst);
+
+    // de-concat the concatnate image into frames
+    void deConcat(const cv::Mat_<cv::Vec3f> &src, const cv::Size &frameSize, std::vector<cv::Mat_<cv::Vec3f> > &frames);
 };
 
 #endif // VIDEOPROCESSOR_H

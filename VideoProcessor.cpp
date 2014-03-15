@@ -298,32 +298,54 @@ void VideoProcessor::amplify(cv::Mat_<cv::Vec3f> &image)
     }
 }
 
-void VideoProcessor::combineImageAndMotion(const cv::Mat src,
-                                         const std::vector<cv::Mat_<cv::Vec3f> > &filtered,
-                                         cv::Mat &dst)
-{
-    cv::Mat_<cv::Vec3f> motion;
-    switch (spatialType) {
-    case LAPLACIAN:
-        reconImgFromLaplacianPyramid(filtered, levels, motion);
-        attenuate(motion);
-        dst = src + motion;
-        break;
-    case GAUSSIAN:        
-        break;
-    default:
-        break;
-    }
-    motion.release();
-}
-
-void VideoProcessor::attenuate(cv::Mat_<cv::Vec3f> &image)
+/** 
+ * attenuate	-	attenuate I, Q channels
+ *
+ * @param src	-	source image
+ * @param dst   -   destinate image
+ */
+void VideoProcessor::attenuate(cv::Mat &src, cv::Mat &dst)
 {
     cv::Mat planes[3];
-    cv::split(image, planes);
+    cv::split(src, planes);
     planes[1] = planes[1] * chromAttenuation;
     planes[2] = planes[2] * chromAttenuation;
-    cv::merge(planes, 3, image);
+    cv::merge(planes, 3, dst);
+}
+
+
+/** 
+ * concat	-	concat all the frames into a single large Mat
+ *              where each column is a reshaped single frame
+ *
+ * @param frames	-	frames of the video sequence
+ * @param dst		-	destinate concatnate image
+ */
+void VideoProcessor::concat(const std::vector<cv::Mat_<cv::Vec3f> > &frames,
+                            cv::Mat_<cv::Vec3f> &dst)
+{
+    cv::Size frameSize = frames.at(0).size();
+    cv::Mat_<cv::Vec3f> temp(frameSize.width*frameSize.height, length-1, CV_8UC3);
+    for (int i = 0; i < length-1; ++i) {    // get a frame if any
+        cv::Mat_<cv::Vec3f> input = frames.at(i);
+        cv::Mat_<cv::Vec3f> reshaped = input.reshape(3, input.cols*input.rows).clone();
+        cv::Mat_<cv::Vec3f> line = temp.col(i);
+        // save the reshaped single frame as a column of the destinate big image
+        reshaped.copyTo(line);
+    }
+    temp.copyTo(dst);
+}
+
+
+void VideoProcessor::deConcat(const cv::Mat_<cv::Vec3f> &src,
+                              const cv::Size &frameSize,
+                              std::vector<cv::Mat_<cv::Vec3f> > &frames)
+{
+    for (int i = 0; i < length-1; ++i) {    // get a line if any
+        cv::Mat_<cv::Vec3f> line = src.col(i).clone();
+        cv::Mat_<cv::Vec3f> reshaped = line.reshape(3, frameSize.height).clone();
+        frames.push_back(reshaped);
+    }
 }
 
 /** 
@@ -750,6 +772,8 @@ void VideoProcessor::motionMagnify()
     cv::Mat input;
     // output frame
     cv::Mat output;
+    // motion image
+    cv::Mat motion;
 
     std::vector<cv::Mat_<cv::Vec3f> > pyramid;
     std::vector<cv::Mat_<cv::Vec3f> > filtered;
@@ -783,7 +807,7 @@ void VideoProcessor::motionMagnify()
         // 2. spatial filtering one frame
         spatialFilter(s, pyramid);
 
-        // 3. temporal filtering a pyramid of one frame
+        // 3. temporal filtering one frame's pyramid
         // and amplify the motion
         if (fnumber == 0){      // is first frame
             lowpass1 = pyramid;
@@ -795,7 +819,8 @@ void VideoProcessor::motionMagnify()
                 temporalFilter(pyramid.at(i), filtered.at(i));
             }
 
-            // amplify each spatial frequency bands according to Figure 6 of paper
+            // amplify each spatial frequency bands
+            // according to Figure 6 of paper
             cv::Mat_<cv::Vec3f> temp = filtered.at(0);
             int w = temp.size().width;
             int h = temp.size().height;
@@ -805,8 +830,8 @@ void VideoProcessor::motionMagnify()
             // (for better visualization)
             exaggeration_factor = 2.0;
 
-            // compute the representative wavelength lambda for the lowest spatial
-            // frequency band of Laplacian pyramid
+            // compute the representative wavelength lambda
+            // for the lowest spatial frequency band of Laplacian pyramid
             lambda = sqrt(w*w + h*h)/3;  // 3 is experimental constant
 
             for (int i=0; i<levels; ++i) {
@@ -820,11 +845,16 @@ void VideoProcessor::motionMagnify()
             }
         }
 
-        // 4. combine motion and image
-        combineImageAndMotion(s, filtered, output);
+        // 5. reconstruct motion image from filtered pyramid
+        reconImgFromLaplacianPyramid(filtered, levels, motion);
 
-        // 5. convert back to rgb color space and CV_8UC3
-        s = output.clone();
+        // 6. attenuate I, Q channels
+        attenuate(motion, motion);
+
+        // 7. combine source frame and motion image
+        s += motion;
+
+        // 8. convert back to rgb color space and CV_8UC3
         ntsc2rgb(s, s);
         output = s.clone();
         double minVal, maxVal;
@@ -868,11 +898,18 @@ void VideoProcessor::colorMagnify()
     cv::Mat input;
     // output frame
     cv::Mat output;
-    // for down-sampling and up-sampling
-    cv::Mat currentLevel;
+    // motion image
+    cv::Mat motion;
+    // temp image
+    cv::Mat_<cv::Vec3f> temp;
 
-    // down-sampled frames
+    // video frames
     std::vector<cv::Mat_<cv::Vec3f> > frames;
+    // down-sampled frames
+    std::vector<cv::Mat_<cv::Vec3f> > dFrames;
+    // filtered frames
+    std::vector<cv::Mat_<cv::Vec3f> > filteredFrames;
+
     // concatenate image of all the down-sample frames
     cv::Mat_<cv::Vec3f> sequence;
     // concatenate filtered image
@@ -894,51 +931,70 @@ void VideoProcessor::colorMagnify()
     // jump to the first frame
     jumpTo(0);
 
-    // spatial filtering
-    // downsample each frame and form a sequence
-    while (getNextFrame(input)){
+    // 1. spatial filtering
+    while (getNextFrame(input) && !isStop()) {
+        // convert to ntsc color space
+        temp = input.clone();
+        frames.push_back(temp);
         std::vector<cv::Mat_<cv::Vec3f> > pyramid;
-        spatialFilter(input, pyramid);
-        frames.push_back(pyramid.at(levels-1));
+        spatialFilter(temp, pyramid);
+        dFrames.push_back(pyramid.at(levels-1));
+        // update process
+        std::string msg= "Spatial Filtering...";
+        emit updateProcessProgress(msg, floor((fnumber++) * 100.0 / length));
     }
+    if (isStop()){
+        emit closeProgressDialog();
+        fnumber = 0;
+        return;
+    }
+    emit closeProgressDialog();
 
-    // load all the frames into a single large Mat
+    // 2. concat all the frames into a single large Mat
     // where each column is a reshaped single frame
-    cv::Size frameSize = frames.at(0).size();
-    cv::Mat_<cv::Vec3f> temp(frameSize.width*frameSize.height, length-1, CV_8UC3);
-    for (int i = 0; i < length-1; ++i) {    // get a frame if any
-        cv::Mat_<cv::Vec3f> input = frames.at(i);
-        cv::Mat_<cv::Vec3f> reshaped = input.reshape(3, input.cols*input.rows).clone();
-        cv::Mat_<cv::Vec3f> line = temp.col(i);
-        reshaped.copyTo(line);
+    // (for processing convenience)
+    concat(dFrames, sequence);
+
+    // 3. temporal filtering
+    temporalFilter(sequence, filtered);
+
+    // 4. amplify color motion
+    amplify(filtered);
+
+    // 5. de-concat the filtered image into filtered frames
+    deConcat(filtered, dFrames.at(0).size(), filteredFrames);
+
+    // 6. amplify each frame
+    // by adding frame image and motions
+    // and write into video
+    fnumber = 0;
+    for (int i=0; i<length-1 && !isStop(); ++i) {
+        // up-sample the motion image
+        upsamplingFromGaussianPyramid(filteredFrames.at(i), levels, motion);
+        temp = frames.at(i) + motion;
+        // convert back to ntsc color space
+        output = temp.clone();
+        double minVal, maxVal;
+        minMaxLoc(output, &minVal, &maxVal); //find minimum and maximum intensities
+        output.convertTo(output, CV_8UC3, 255.0/(maxVal - minVal),
+                  -minVal * 255.0/(maxVal - minVal));
+        tempWriter.write(output);
+
+        std::string msg= "Amplifying...";
+        emit updateProcessProgress(msg, floor((fnumber++) * 100.0 / length));
     }
-
-    // convert to ntsc color space
-    rgb2ntsc(temp.clone(), sequence);
-
-    // temporal filtering
-    temporalIdealFilter(sequence, filtered);
-
-    // amplify color motion
-    filtered *= alpha;
-
-    // up-sample color motion
-    currentLevel = filtered.clone();
-    for (int i = 0; i < levels; ++i) {
-        cv::Mat up;
-        cv::pyrUp(currentLevel, up);
-        currentLevel = up;
+    if (!isStop()) {
+        emit revert();
     }
+    emit closeProgressDialog();
 
-    cv::imwrite("before.png", sequence);
+    // release the temp writer
+    tempWriter.release();
 
-    // combine color motion and source frame
-    cv::resize(filtered, filtered, sequence.size());
-    cv::imwrite("motion.png", filtered);
-    sequence += filtered;
-    ntsc2rgb(sequence, sequence);
-    cv::imwrite("result.png", sequence);
+    // change the video to the processed video
+    setInput(tempFile);
 
+    // jump back to the original position
     jumpTo(pos);
 }
 

@@ -1,5 +1,14 @@
 #include "SpatialFilter.h"
 
+/** 
+ * buildLaplacianPyramid	-	construct a laplacian pyramid from given image
+ *
+ * @param img		-	source image
+ * @param levels	-	levels of the destinate pyramids
+ * @param pyramid	-	destinate image
+ *
+ * @return true if success
+ */
 bool buildLaplacianPyramid(const cv::Mat &img, const int levels,
                            std::vector<cv::Mat_<cv::Vec3f> > &pyramid)
 {
@@ -21,6 +30,15 @@ bool buildLaplacianPyramid(const cv::Mat &img, const int levels,
     return true;
 }
 
+/** 
+ * buildGaussianPyramid	-	construct a gaussian pyramid from a given image
+ *
+ * @param img		-	source image
+ * @param levels	-	levels of the destinate pyramids
+ * @param pyramid	-	destinate image
+ *
+ * @return true if success
+ */
 bool buildGaussianPyramid(const cv::Mat &img,
                           const int levels,
                           std::vector<cv::Mat_<cv::Vec3f> > &pyramid)
@@ -40,6 +58,13 @@ bool buildGaussianPyramid(const cv::Mat &img,
     return true;
 }
 
+/** 
+ * reconImgFromLaplacianPyramid	-	reconstruct image from given laplacian pyramid
+ *
+ * @param pyramid	-	source laplacian pyramid
+ * @param levels	-	levels of the pyramid
+ * @param dst		-	destinate image
+ */
 void reconImgFromLaplacianPyramid(const std::vector<cv::Mat_<cv::Vec3f> > &pyramid,
                                   const int levels,
                                   cv::Mat &dst)
@@ -50,4 +75,24 @@ void reconImgFromLaplacianPyramid(const std::vector<cv::Mat_<cv::Vec3f> > &pyram
         cv::pyrUp(dst, up, pyramid[l].size());
         dst = up + pyramid[l];
     }
+}
+
+/** 
+ * upsamplingFromGaussianPyramid	-	up-sampling an image from gaussian pyramid
+ *
+ * @param src		-	source image
+ * @param levels	-	levels of the pyramid
+ * @param dst		-	destinate image
+ */
+void upsamplingFromGaussianPyramid(const cv::Mat_<cv::Vec3f> &src,
+                                   const int levels,
+                                   cv::Mat &dst)
+{
+    cv::Mat currentLevel = src.clone();
+    for (int i = 0; i < levels; ++i) {
+        cv::Mat up;
+        cv::pyrUp(currentLevel, up);
+        currentLevel = up;
+    }
+    currentLevel.copyTo(dst);
 }
