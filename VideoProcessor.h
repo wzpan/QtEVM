@@ -231,15 +231,15 @@ private:
 
     // temporal filtering
     void temporalFilter(const cv::Mat &src,
-                        cv::Mat_<cv::Vec3f> &dst);
+                        cv::Mat &dst);
 
     // temporal IIR filtering
     void temporalIIRFilter(const cv::Mat &src,
-                        cv::Mat_<cv::Vec3f> &dst);
+                        cv::Mat &dst);
 
     // temporal ideal bandpass filtering
     void temporalIdealFilter(const cv::Mat &src,
-                             cv::Mat_<cv::Vec3f> &dst);
+                             cv::Mat &dst);
 
     // amplify motion
     void amplify(const cv::Mat &src, cv::Mat &dst);

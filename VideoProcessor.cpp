@@ -180,7 +180,7 @@ bool VideoProcessor::spatialFilter(const cv::Mat &src, std::vector<cv::Mat_<cv::
  * @param dst	-	destinate image
  */
 void VideoProcessor::temporalFilter(const cv::Mat &src,
-                                    cv::Mat_<cv::Vec3f> &dst)
+                                    cv::Mat &dst)
 {
     switch(temporalType) {
     case IIR:       // IIR bandpass filter
@@ -204,7 +204,7 @@ void VideoProcessor::temporalFilter(const cv::Mat &src,
  * @return true if amplifying is allowed; false otherwise
  */
 void VideoProcessor::temporalIIRFilter(const cv::Mat &src,
-                                    cv::Mat_<cv::Vec3f> &dst)
+                                    cv::Mat &dst)
 {
     cv::Mat temp1 = (1-fh)*lowpass1[curLevel] + fh*src;
     cv::Mat temp2 = (1-fl)*lowpass2[curLevel] + fl*src;
@@ -222,31 +222,29 @@ void VideoProcessor::temporalIIRFilter(const cv::Mat &src,
  *
  * @return true if amplifying is allowed; false otherwise
  */
-void VideoProcessor:: temporalIdealFilter(const cv::Mat &src,
-                                          cv::Mat_<cv::Vec3f> &dst)
+void VideoProcessor::temporalIdealFilter(const cv::Mat &src,
+                                          cv::Mat &dst)
 {
     cv::Mat channels[3];
-    cv::Size dftSize;   // filter size
 
     // split into 3 channels
     cv::split(src, channels);
 
-    for (int j = 0; j < 3; ++j){
+    for (int i = 0; i < 3; ++i){
 
-        cv::Mat current = channels[j];  // current channel
+        cv::Mat current = channels[i];  // current channel
+        cv::Mat tempImg;
 
-        dftSize.width = cv::getOptimalDFTSize(2 * current.cols - 1);
-        dftSize.height = cv::getOptimalDFTSize(2 * current.rows - 1);
+        int width = cv::getOptimalDFTSize(current.cols);
+        int height = cv::getOptimalDFTSize(current.rows);
 
-        // allocate temporary buffers and initialize them with 0’s
-        cv::Mat tempImg(dftSize, current.type(), cv::Scalar::all(0));
-
-        // copy A to the top-left corners of tempA
-        cv::Mat roi(tempImg, cv::Rect(0,0,current.cols,current.rows));
-        current.copyTo(roi);
+        cv::copyMakeBorder(current, tempImg,
+                           0, height - current.rows,
+                           0, width - current.cols,
+                           cv::BORDER_CONSTANT, cv::Scalar::all(0));
 
         // do the DFT
-        cv::dft(tempImg, tempImg, cv::DFT_ROWS | cv::DFT_SCALE);
+        cv::dft(tempImg, tempImg, cv::DFT_ROWS | cv::DFT_SCALE, tempImg.rows);
 
         // construct the filter
         cv::Mat filter = tempImg.clone();
@@ -256,16 +254,16 @@ void VideoProcessor:: temporalIdealFilter(const cv::Mat &src,
         cv::mulSpectrums(tempImg, filter, tempImg, cv::DFT_ROWS);
 
         // do the inverse DFT on filtered image
-        cv::idft(tempImg, tempImg, cv::DFT_ROWS | cv::DFT_SCALE);
-
-        // normalize the filtered image
-        cv::normalize(tempImg, tempImg, 0, 1, CV_MINMAX);
+        cv::idft(tempImg, tempImg, cv::DFT_ROWS | cv::DFT_SCALE, tempImg.rows);
 
         // copy back to the current channel
-        tempImg(cv::Rect(0, 0, current.cols, current.rows)).copyTo(current);
+        tempImg(cv::Rect(0, 0, current.cols, current.rows)).copyTo(channels[i]);
     }
     // merge channels
     cv::merge(channels, 3, dst);
+
+    // normalize the filtered image
+    cv::normalize(dst, dst, 0, 1, CV_MINMAX);
 }
 
 /** 
@@ -980,7 +978,7 @@ void VideoProcessor::colorMagnify()
     // 1. spatial filtering
     while (getNextFrame(input) && !isStop()) {
         // convert to ntsc color space
-        rgb2ntsc(input, temp);
+        temp = input.clone();
         frames.push_back(temp);
         // spatial filtering
         std::vector<cv::Mat_<cv::Vec3f> > pyramid;
@@ -1020,7 +1018,6 @@ void VideoProcessor::colorMagnify()
         upsamplingFromGaussianPyramid(filteredFrames.at(i), levels, motion);
         temp = frames.at(i) + motion;
         // convert back to ntsc color space
-        ntsc2rgb(temp, temp);
         output = temp.clone();
         double minVal, maxVal;
         minMaxLoc(output, &minVal, &maxVal); //find minimum and maximum intensities

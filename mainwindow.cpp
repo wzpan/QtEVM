@@ -328,13 +328,12 @@ void MainWindow::updateProcessProgress(const std::string &message, int value)
         progressDialog->setLabelText(QString::fromStdString(message));
         progressDialog->setRange(0, 100);
         progressDialog->setModal(true);
+        progressDialog->setCancelButtonText(tr("Abort"));
+        progressDialog->show();
+        progressDialog->raise();
+        progressDialog->activateWindow();
     }
     progressDialog->setValue(value + 1);
-    // progressDialog->setCancelButton(0);
-    progressDialog->setCancelButtonText(tr("Abort"));
-    progressDialog->show();
-    progressDialog->raise();
-    progressDialog->activateWindow();
     qApp->processEvents();
     if (progressDialog->wasCanceled()){
         video->stopIt();
