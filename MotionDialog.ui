@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>ParamDialog</class>
- <widget class="QDialog" name="ParamDialog">
+ <class>MotionDialog</class>
+ <widget class="QDialog" name="MotionDialog">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Laplacian IIR</string>
+   <string>Eulerian Motion Magnification</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
    <item row="0" column="0">
@@ -37,13 +37,13 @@
              </sizepolicy>
             </property>
             <property name="maximum">
-             <number>1000</number>
+             <number>100</number>
             </property>
             <property name="singleStep">
              <number>10</number>
             </property>
             <property name="pageStep">
-             <number>100</number>
+             <number>10</number>
             </property>
             <property name="value">
              <number>10</number>
@@ -283,7 +283,7 @@
   <connection>
    <sender>okButton</sender>
    <signal>clicked()</signal>
-   <receiver>ParamDialog</receiver>
+   <receiver>MotionDialog</receiver>
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -299,7 +299,7 @@
   <connection>
    <sender>cancelButton</sender>
    <signal>clicked()</signal>
-   <receiver>ParamDialog</receiver>
+   <receiver>MotionDialog</receiver>
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">

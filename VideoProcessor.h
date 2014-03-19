@@ -13,7 +13,6 @@
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include "SpatialFilter.h"
-#include "TemporalFilter.h"
 #include "Utils.h"
 
 enum spatialFilterType {LAPLACIAN, GAUSSIAN};
@@ -23,7 +22,7 @@ class VideoProcessor : public QObject {
 
     Q_OBJECT
 
-    friend class ParamDialog;
+    friend class MotionDialog;
 
 public:
 
@@ -231,19 +230,19 @@ private:
     bool spatialFilter(const cv::Mat &src, std::vector<cv::Mat_<cv::Vec3f> > &pyramid);
 
     // temporal filtering
-    void temporalFilter(const cv::Mat_<cv::Vec3f> &src,
+    void temporalFilter(const cv::Mat &src,
                         cv::Mat_<cv::Vec3f> &dst);
 
     // temporal IIR filtering
-    void temporalIIRFilter(const cv::Mat_<cv::Vec3f> &src,
+    void temporalIIRFilter(const cv::Mat &src,
                         cv::Mat_<cv::Vec3f> &dst);
 
     // temporal ideal bandpass filtering
-    void temporalIdealFilter(const cv::Mat_<cv::Vec3f> &src,
+    void temporalIdealFilter(const cv::Mat &src,
                              cv::Mat_<cv::Vec3f> &dst);
 
     // amplify motion
-    void amplify(const cv::Mat_<cv::Vec3f> &src, cv::Mat_<cv::Vec3f> &dst);
+    void amplify(const cv::Mat &src, cv::Mat &dst);
 
     // attenuate I, Q channels
     void attenuate(cv::Mat &src, cv::Mat &dst);
@@ -253,6 +252,9 @@ private:
 
     // de-concat the concatnate image into frames
     void deConcat(const cv::Mat_<cv::Vec3f> &src, const cv::Size &frameSize, std::vector<cv::Mat_<cv::Vec3f> > &frames);
+
+    // create an ideal bandpass processor
+    void createIdealBandpassFilter(cv::Mat &filter, double fl, double fh, double rate);
 };
 
 #endif // VIDEOPROCESSOR_H

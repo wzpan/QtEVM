@@ -15,10 +15,10 @@ bool buildLaplacianPyramid(const cv::Mat &img, const int levels,
 
 // reconstruct an image from a laplacian pyramid
 void reconImgFromLaplacianPyramid(const std::vector<cv::Mat_<cv::Vec3f> > &pyramid, const int levels,
-                                  cv::Mat &dst);
+                                  cv::Mat_<cv::Vec3f> &dst);
 
 // up-sampling an image from gaussian pyramid
-void upsamplingFromGaussianPyramid(const cv::Mat_<cv::Vec3f> &src, const int levels,
-                                   cv::Mat &dst);
+void upsamplingFromGaussianPyramid(const cv::Mat &src, const int levels,
+                                   cv::Mat_<cv::Vec3f> &dst);
 
 #endif // SPATIALFILTER_H

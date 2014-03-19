@@ -20,7 +20,7 @@ MainWindow::MainWindow(QWidget *parent) :
     progressDialog =  0;
 
     // Laplacian IIR amplify
-    paramDialog = 0;
+    motionDialog = 0;
 
     updateStatus(false);
 
@@ -473,6 +473,7 @@ void MainWindow::on_progressSlider_sliderMoved(int position)
     updateTimeLabel();
 }
 
+// canceling the process
 void MainWindow::closeProgressDialog()
 {
     progressDialog->close();
@@ -498,19 +499,18 @@ void MainWindow::on_actionClean_Temp_Files_triggered()
     }
 }
 
+// motion magnification
 void MainWindow::on_motion_triggered()
 {
-    // show laplacian IIR dialog
-    if (!paramDialog)
-        paramDialog = new ParamDialog(this, video);
+    // show parameter dialog
+    if (!motionDialog)
+        motionDialog = new MotionDialog(this, video);
 
-    paramDialog->show();
-    paramDialog->raise();
-    paramDialog->activateWindow();
+    motionDialog->show();
+    motionDialog->raise();
+    motionDialog->activateWindow();
 
-    if (paramDialog->exec() == QDialog::Accepted) {
-        video->setSpatialFilter(LAPLACIAN);
-        video->setTemporalFilter(IIR);        
+    if (motionDialog->exec() == QDialog::Accepted) {
         // change the cursor
         QApplication::setOverrideCursor(Qt::WaitCursor);
         // run the process
@@ -520,19 +520,18 @@ void MainWindow::on_motion_triggered()
     }
 }
 
+// color (motion) magnification
 void MainWindow::on_color_triggered()
 {
-    // show laplacian IIR dialog
-    if (!paramDialog)
-        paramDialog = new ParamDialog(this, video);
+    // show parameter dialog
+    if (!motionDialog)
+        motionDialog = new MotionDialog(this, video);
 
-    paramDialog->show();
-    paramDialog->raise();
-    paramDialog->activateWindow();
+    motionDialog->show();
+    motionDialog->raise();
+    motionDialog->activateWindow();
 
-    if (paramDialog->exec() == QDialog::Accepted) {        
-        video->setSpatialFilter(GAUSSIAN);
-        video->setTemporalFilter(IDEAL);
+    if (motionDialog->exec() == QDialog::Accepted) {
         // change the cursor
         QApplication::setOverrideCursor(Qt::WaitCursor);
         // run the process

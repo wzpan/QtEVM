@@ -179,14 +179,14 @@ bool VideoProcessor::spatialFilter(const cv::Mat &src, std::vector<cv::Mat_<cv::
  * @param src	-	source image
  * @param dst	-	destinate image
  */
-void VideoProcessor::temporalFilter(const cv::Mat_<cv::Vec3f> &src,
+void VideoProcessor::temporalFilter(const cv::Mat &src,
                                     cv::Mat_<cv::Vec3f> &dst)
 {
     switch(temporalType) {
     case IIR:       // IIR bandpass filter
         temporalIIRFilter(src, dst);
         break;
-    case IDEAL:
+    case IDEAL:     // Ideal bandpass filter
         temporalIdealFilter(src, dst);
         break;
     default:        
@@ -203,7 +203,7 @@ void VideoProcessor::temporalFilter(const cv::Mat_<cv::Vec3f> &src,
  *
  * @return true if amplifying is allowed; false otherwise
  */
-void VideoProcessor::temporalIIRFilter(const cv::Mat_<cv::Vec3f> &src,
+void VideoProcessor::temporalIIRFilter(const cv::Mat &src,
                                     cv::Mat_<cv::Vec3f> &dst)
 {
     cv::Mat temp1 = (1-fh)*lowpass1[curLevel] + fh*src;
@@ -215,80 +215,57 @@ void VideoProcessor::temporalIIRFilter(const cv::Mat_<cv::Vec3f> &src,
 
 /** 
  * temporalIdalFilter	-	temporal IIR filtering an image pyramid of concat-frames
+ *                          (Thanks to Daniel Ron & Alessandro Gentilini)
  *
  * @param pyramid	-	source pyramid of concatenate frames
  * @param filtered	-	concatenate filtered result
  *
  * @return true if amplifying is allowed; false otherwise
  */
-void VideoProcessor:: temporalIdealFilter(const cv::Mat_<cv::Vec3f> &src,
+void VideoProcessor:: temporalIdealFilter(const cv::Mat &src,
                                           cv::Mat_<cv::Vec3f> &dst)
 {
-    cv::Mat colors[3], planes[2];
-    cv::Mat padded, complexImg, filter, mag;
-
-    cv::Mat filterPlanes[2], filterOutput;
+    cv::Mat channels[3];
+    cv::Size dftSize;   // filter size
 
     // split into 3 channels
-    cv::split(src, colors);
+    cv::split(src, channels);
 
     for (int j = 0; j < 3; ++j){
-        int M = cv::getOptimalDFTSize(src.rows);
-        int N = cv::getOptimalDFTSize(src.cols);
-        cv::Mat temp = colors[j];
-        // setup the DFT images
-        cv::copyMakeBorder(temp, padded, 0, M - temp.rows, 0,
-                           N - temp.cols, cv::BORDER_CONSTANT, cv::Scalar::all(0));
-        planes[0] = cv::Mat_<float>(padded);
-        planes[1] = cv::Mat::zeros(padded.size(), CV_32F);
 
-        cv::merge(planes, 2, complexImg);
+        cv::Mat current = channels[j];  // current channel
+
+        dftSize.width = cv::getOptimalDFTSize(2 * current.cols - 1);
+        dftSize.height = cv::getOptimalDFTSize(2 * current.rows - 1);
+
+        // allocate temporary buffers and initialize them with 0’s
+        cv::Mat tempImg(dftSize, current.type(), cv::Scalar::all(0));
+
+        // copy A to the top-left corners of tempA
+        cv::Mat roi(tempImg, cv::Rect(0,0,current.cols,current.rows));
+        current.copyTo(roi);
 
         // do the DFT
-        cv::dft(complexImg, complexImg, cv::DFT_ROWS | cv::DFT_SCALE);
+        cv::dft(tempImg, tempImg, cv::DFT_ROWS | cv::DFT_SCALE);
 
         // construct the filter
-        filter = complexImg.clone();
+        cv::Mat filter = tempImg.clone();
         createIdealBandpassFilter(filter, fl, fh, rate);
 
         // apply filter
-        shiftDFT(complexImg);
-        cv::mulSpectrums(complexImg, filter, complexImg, cv::DFT_ROWS);
-        shiftDFT(complexImg);
-
-        // create magnitude spectrum for display
-        mag = create_spectrum_magnitude_display(complexImg, true);
+        cv::mulSpectrums(tempImg, filter, tempImg, cv::DFT_ROWS);
 
         // do the inverse DFT on filtered image
-        cv::idft(complexImg, complexImg, cv::DFT_ROWS | cv::DFT_SCALE);
+        cv::idft(tempImg, tempImg, cv::DFT_ROWS | cv::DFT_SCALE);
 
-        // split into planes and extract plane 0 as output image
-        cv::Mat myplanes[2];
-        split(complexImg, myplanes);
+        // normalize the filtered image
+        cv::normalize(tempImg, tempImg, 0, 1, CV_MINMAX);
 
-//        double minimum = -1;
-//        double maximum = -1;
-//        cv::Point minloc(-1, -1), maxloc(-1, -1);
-//        cv::minMaxLoc(myplanes[0], &minimum, &maximum, &minloc, &maxloc);
-
-        cv::normalize(myplanes[0], temp, 0, 1, CV_MINMAX);
-        myplanes[0].copyTo(temp);
-
-        // do the same with the filter image
-        cv::split(filter, filterPlanes);
-        cv::normalize(filterPlanes[0], filterOutput, 0, 1, CV_MINMAX);
-
-        std::stringstream ss;
-        ss << "filter-channel-" << j + 1 << ".png";
-        cv::imwrite(ss.str(), filterOutput);
-        ss.flush();
-
-        ss << "filtered-channel-" << j + 1<< ".png";
-        cv::imwrite(ss.str(), mag);
-        ss.flush();
+        // copy back to the current channel
+        tempImg(cv::Rect(0, 0, current.cols, current.rows)).copyTo(current);
     }
     // merge channels
-    cv::merge(colors, 3, dst);
+    cv::merge(channels, 3, dst);
 }
 
 /** 
@@ -296,7 +273,7 @@ void VideoProcessor:: temporalIdealFilter(const cv::Mat_<cv::Vec3f> &src,
  *
  * @param filtered	- motion image
  */
-void VideoProcessor::amplify(const cv::Mat_<cv::Vec3f> &src, cv::Mat_<cv::Vec3f> &dst)
+void VideoProcessor::amplify(const cv::Mat &src, cv::Mat &dst)
 {
     float currAlpha;    
     switch (spatialType) {
@@ -359,6 +336,13 @@ void VideoProcessor::concat(const std::vector<cv::Mat_<cv::Vec3f> > &frames,
     temp.copyTo(dst);
 }
 
+/**
+ * deConcat	-	de-concat the concatnate image into frames
+ *
+ * @param src       -   source concatnate image
+ * @param framesize	-	frame size
+ * @param frames	-	destinate frames
+ */
 void VideoProcessor::deConcat(const cv::Mat_<cv::Vec3f> &src,
                               const cv::Size &frameSize,
                               std::vector<cv::Mat_<cv::Vec3f> > &frames)
@@ -367,6 +351,36 @@ void VideoProcessor::deConcat(const cv::Mat_<cv::Vec3f> &src,
         cv::Mat_<cv::Vec3f> line = src.col(i).clone();
         cv::Mat_<cv::Vec3f> reshaped = line.reshape(3, frameSize.height).clone();
         frames.push_back(reshaped);
+    }
+}
+
+/**
+ * createIdealBandpassFilter	-	create a 1D ideal band-pass filter
+ *
+ * @param filter    -	destinate filter
+ * @param fl        -	low cut-off
+ * @param fh		-	high cut-off
+ * @param rate      -   sampling rate(i.e. video frame rate)
+ */
+void VideoProcessor::createIdealBandpassFilter(cv::Mat &filter, double fl, double fh, double rate)
+{
+    int width = filter.cols;
+    int height = filter.rows;
+
+    fl = 2 * fl * width / rate;
+    fh = 2 * fh * width / rate;
+
+    double response;
+
+    for (int i = 0; i < height; ++i) {
+        for (int j = 0; j < width; ++j) {
+            // filter response
+            if (j >= fl && j <= fh)
+                response = 1.0f;
+            else
+                response = 0.0f;
+            filter.at<float>(i, j) = response;
+        }
     }
 }
 
@@ -787,6 +801,10 @@ void VideoProcessor::pauseIt()
  */
 void VideoProcessor::motionMagnify()
 {
+    // set filter
+    setSpatialFilter(LAPLACIAN);
+    setTemporalFilter(IIR);
+
     // create a temp file
     createTemp();
 
@@ -794,8 +812,9 @@ void VideoProcessor::motionMagnify()
     cv::Mat input;
     // output frame
     cv::Mat output;
+
     // motion image
-    cv::Mat motion;
+    cv::Mat_<cv::Vec3f> motion;
 
     std::vector<cv::Mat_<cv::Vec3f> > pyramid;
     std::vector<cv::Mat_<cv::Vec3f> > filtered;
@@ -819,7 +838,7 @@ void VideoProcessor::motionMagnify()
 
         // read next frame if any
         if (!getNextFrame(input))
-            break;        
+            break;
 
         cv::Mat_<cv::Vec3f> s;
 
@@ -842,10 +861,10 @@ void VideoProcessor::motionMagnify()
             }
 
             // amplify each spatial frequency bands
-            // according to Figure 6 of paper
-            cv::Mat_<cv::Vec3f> temp = filtered.at(0);
-            int w = temp.size().width;
-            int h = temp.size().height;
+            // according to Figure 6 of paper            
+            cv::Size filterSize = filtered.at(0).size();
+            int w = filterSize.width;
+            int h = filterSize.height;
 
             delta = lambda_c/8.0/(1.0+alpha);
             // the factor to boost alpha above the bound
@@ -913,6 +932,10 @@ void VideoProcessor::motionMagnify()
  */
 void VideoProcessor::colorMagnify()
 {
+    // set filter
+    setSpatialFilter(GAUSSIAN);
+    setTemporalFilter(IDEAL);
+
     // create a temp file
     createTemp();
 
@@ -921,7 +944,8 @@ void VideoProcessor::colorMagnify()
     // output frame
     cv::Mat output;
     // motion image
-    cv::Mat motion;
+
+    cv::Mat_<cv::Vec3f> motion;
     // temp image
     cv::Mat_<cv::Vec3f> temp;
 
@@ -956,9 +980,9 @@ void VideoProcessor::colorMagnify()
     // 1. spatial filtering
     while (getNextFrame(input) && !isStop()) {
         // convert to ntsc color space
-        temp = input.clone();
-        // rgb2ntsc(temp, temp);
+        rgb2ntsc(input, temp);
         frames.push_back(temp);
+        // spatial filtering
         std::vector<cv::Mat_<cv::Vec3f> > pyramid;
         spatialFilter(temp, pyramid);
         downSampledFrames.push_back(pyramid.at(levels-1));
@@ -996,7 +1020,7 @@ void VideoProcessor::colorMagnify()
         upsamplingFromGaussianPyramid(filteredFrames.at(i), levels, motion);
         temp = frames.at(i) + motion;
         // convert back to ntsc color space
-        // ntsc2rgb(temp, temp);
+        ntsc2rgb(temp, temp);
         output = temp.clone();
         double minVal, maxVal;
         minMaxLoc(output, &minVal, &maxVal); //find minimum and maximum intensities

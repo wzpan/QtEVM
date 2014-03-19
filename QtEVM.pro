@@ -15,21 +15,19 @@ SOURCES += main.cpp\
         mainwindow.cpp \
     WindowHelper.cpp \
     VideoProcessor.cpp \
-    ParamDialog.cpp \
     SpatialFilter.cpp \
-    TemporalFilter.cpp \
-    Utils.cpp
+    Utils.cpp \
+    MotionDialog.cpp
 
 HEADERS  += mainwindow.h \
     WindowHelper.h \
     Utils.h \
     VideoProcessor.h \
-    ParamDialog.h \
-    TemporalFilter.h \
-    SpatialFilter.h
+    SpatialFilter.h \
+    MotionDialog.h
 
 FORMS    += mainwindow.ui \
-    ParamDialog.ui
+    MotionDialog.ui
 
 RESOURCES += \
     myResources.qrc

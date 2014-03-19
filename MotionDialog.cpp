@@ -1,10 +1,10 @@
-#include "ParamDialog.h"
+#include "MotionDialog.h"
 #include <string.h>
-#include "ui_ParamDialog.h"
+#include "ui_MotionDialog.h"
 
-ParamDialog::ParamDialog(QWidget *parent, VideoProcessor *processor) :
+MotionDialog::MotionDialog(QWidget *parent, VideoProcessor *processor) :
     QDialog(parent),
-    ui(new Ui::ParamDialog)
+    ui(new Ui::MotionDialog)
 {
     ui->setupUi(this);
 
@@ -34,20 +34,20 @@ ParamDialog::ParamDialog(QWidget *parent, VideoProcessor *processor) :
     ui->chromLabel->setText(QString::fromStdString(ss.str()));
 }
 
-ParamDialog::~ParamDialog()
+MotionDialog::~MotionDialog()
 {
     delete ui;
 }
 
-void ParamDialog::on_alphaSlider_valueChanged(int value)
+void MotionDialog::on_alphaSlider_valueChanged(int value)
 {
-    processor->alpha = value / 10.0;
+    processor->alpha = value;
     std::stringstream ss;
     ss << alphaStr.toStdString() << processor->alpha;
     ui->alphaLabel->setText(QString::fromStdString(ss.str()));
 }
 
-void ParamDialog::on_lambdaSlider_valueChanged(int value)
+void MotionDialog::on_lambdaSlider_valueChanged(int value)
 {
     processor->lambda_c = value;
     std::stringstream ss;
@@ -55,7 +55,7 @@ void ParamDialog::on_lambdaSlider_valueChanged(int value)
     ui->lambdaLabel->setText(QString::fromStdString(ss.str()));
 }
 
-void ParamDialog::on_flSlider_valueChanged(int value)
+void MotionDialog::on_flSlider_valueChanged(int value)
 {
     processor->fl = value / 100.0;
     std::stringstream ss;
@@ -63,7 +63,7 @@ void ParamDialog::on_flSlider_valueChanged(int value)
     ui->flLabel->setText(QString::fromStdString(ss.str()));
 }
 
-void ParamDialog::on_fhSlider_valueChanged(int value)
+void MotionDialog::on_fhSlider_valueChanged(int value)
 {
     processor->fh = value / 100.0;
     std::stringstream ss;
@@ -71,7 +71,7 @@ void ParamDialog::on_fhSlider_valueChanged(int value)
     ui->fhLabel->setText(QString::fromStdString(ss.str()));
 }
 
-void ParamDialog::on_chromSlider_valueChanged(int value)
+void MotionDialog::on_chromSlider_valueChanged(int value)
 {
     processor->chromAttenuation = value / 10.0;
     std::stringstream ss;

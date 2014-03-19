@@ -12,7 +12,7 @@
 #include <QLabel>
 #include <queue>
 #include "VideoProcessor.h"
-#include "ParamDialog.h"
+#include "MotionDialog.h"
 #include "WindowHelper.h"
 #include <opencv2/core/core.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
@@ -104,8 +104,8 @@ private:
     // Process progress
     QProgressDialog *progressDialog;
 
-    // Laplacian IIR amplify dialog
-    ParamDialog *paramDialog;
+    // Motion Magnification dialog
+    MotionDialog *motionDialog;
 
     void updateStatus(bool vi);
     void updateTimeLabel();
