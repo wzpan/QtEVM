@@ -73,41 +73,32 @@ cv::Mat create_spectrum_magnitude_display(cv::Mat &complexImg, bool rearrange)
 
 
 /**
- * createIdealBandpassFilter	-	create a 2-channel ideal band-pass filter
- *		with cutoff frequencies fl and fh (assumes pre-aollocated size of dft_Filter specifies dimensions)
+ * createIdealBandpassFilter	-	create a 1D ideal band-pass filter
  *
  * @param filter    -	destinate filter
  * @param fl        -	low cut-off
  * @param fh		-	high cut-off
+ * @param rate      -   sampling rate(i.e. video frame rate)
  */
 void createIdealBandpassFilter(cv::Mat &filter, double fl, double fh, double rate)
 {
     int width = filter.cols;
     int height = filter.rows;
 
-    double f1 = 2 * tan(M_PI * fl / rate);
-    double f2 = 2 * tan(M_PI * fh / rate);
-    double D = sqrt(f1 * f2);
-    double W = f2 - f1;
+    fl = 2 * fl * width / rate;
+    fh = 2 * fh * width / rate;
 
     cv::Mat tmp = cv::Mat(filter.rows, filter.cols, CV_32F);
-    cv::Point centre = cv::Point(filter.rows / 2.0, filter.cols / 2.0);
 
-    double radius, response;
+    double response;
 
-    for (int i = 0; i < height; i+=rate)
-    {
-        for (int j = 0; j < width; j+=rate)
-        {
-            radius = (double) sqrt(pow((j - centre.x), 2.0) + pow((double) (i - centre.y), 2.0));
-
+    for (int i = 0; i < height; ++i) {
+        for (int j = 0; j < width; ++j) {
             // filter response
-            if (radius >= D - W/2 && radius <= D + W/2)
+            if (j >= fl && j <= fh)
                 response = 1.0f;
             else
                 response = 0.0f;
-
-            // applying filter response
             tmp.at<float>(i, j) = response;
         }
     }

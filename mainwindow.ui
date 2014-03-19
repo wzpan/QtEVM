@@ -394,6 +394,15 @@
   </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
+ <tabstops>
+  <tabstop>btnPlay</tabstop>
+  <tabstop>btnPause</tabstop>
+  <tabstop>btnStop</tabstop>
+  <tabstop>btnLast</tabstop>
+  <tabstop>btnNext</tabstop>
+  <tabstop>progressSlider</tabstop>
+  <tabstop>scrollArea</tabstop>
+ </tabstops>
  <resources>
   <include location="myResources.qrc"/>
  </resources>

@@ -243,7 +243,7 @@ private:
                              cv::Mat_<cv::Vec3f> &dst);
 
     // amplify motion
-    void amplify(cv::Mat_<cv::Vec3f> &image);
+    void amplify(const cv::Mat_<cv::Vec3f> &src, cv::Mat_<cv::Vec3f> &dst);
 
     // attenuate I, Q channels
     void attenuate(cv::Mat &src, cv::Mat &dst);

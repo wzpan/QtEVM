@@ -225,7 +225,9 @@ void VideoProcessor:: temporalIdealFilter(const cv::Mat_<cv::Vec3f> &src,
                                           cv::Mat_<cv::Vec3f> &dst)
 {
     cv::Mat colors[3], planes[2];
-    cv::Mat padded, complexImg, filter;
+    cv::Mat padded, complexImg, filter, mag;
+
+    cv::Mat filterPlanes[2], filterOutput;
 
     // split into 3 channels
     cv::split(src, colors);
@@ -251,22 +253,41 @@ void VideoProcessor:: temporalIdealFilter(const cv::Mat_<cv::Vec3f> &src,
 
         // apply filter
         shiftDFT(complexImg);
-        cv::mulSpectrums(complexImg, filter, complexImg, 0);
+        cv::mulSpectrums(complexImg, filter, complexImg, cv::DFT_ROWS);
         shiftDFT(complexImg);
 
-        // do the IDFT
+        // create magnitude spectrum for display
+        mag = create_spectrum_magnitude_display(complexImg, true);
+
+        // do the inverse DFT on filtered image
         cv::idft(complexImg, complexImg, cv::DFT_ROWS | cv::DFT_SCALE);
 
         // split into planes and extract plane 0 as output image
         cv::Mat myplanes[2];
         split(complexImg, myplanes);
-        double minimum = -1;
-        double maximum = -1;
-        cv::Point minloc(-1, -1), maxloc(-1, -1);
-        cv::minMaxLoc(myplanes[0], &minimum, &maximum, &minloc, &maxloc);
-        // cv::normalize(myplanes[0], temp, 0, 1, CV_MINMAX);
+
+//        double minimum = -1;
+//        double maximum = -1;
+//        cv::Point minloc(-1, -1), maxloc(-1, -1);
+//        cv::minMaxLoc(myplanes[0], &minimum, &maximum, &minloc, &maxloc);
+
+        cv::normalize(myplanes[0], temp, 0, 1, CV_MINMAX);
         myplanes[0].copyTo(temp);
+
+        // do the same with the filter image
+        cv::split(filter, filterPlanes);
+        cv::normalize(filterPlanes[0], filterOutput, 0, 1, CV_MINMAX);
+
+        std::stringstream ss;
+        ss << "filter-channel-" << j + 1 << ".png";
+        cv::imwrite(ss.str(), filterOutput);
+        ss.flush();
+
+        ss << "filtered-channel-" << j + 1<< ".png";
+        cv::imwrite(ss.str(), mag);
+        ss.flush();
     }
+    // merge channels
     cv::merge(colors, 3, dst);
 }
 
@@ -275,23 +296,23 @@ void VideoProcessor:: temporalIdealFilter(const cv::Mat_<cv::Vec3f> &src,
  *
  * @param filtered	- motion image
  */
-void VideoProcessor::amplify(cv::Mat_<cv::Vec3f> &image)
+void VideoProcessor::amplify(const cv::Mat_<cv::Vec3f> &src, cv::Mat_<cv::Vec3f> &dst)
 {
-    float currAlpha;
+    float currAlpha;    
     switch (spatialType) {
-    case LAPLACIAN:
+    case LAPLACIAN:        
         //compute modified alpha for this level
         currAlpha = lambda/delta/8 - 1;
         currAlpha *= exaggeration_factor;
         if (curLevel==levels-1 || curLevel==0)     // ignore the highest and lowest frequency band
-            image *= 0;
+            dst = src * 0;
         else if (currAlpha > alpha)  // representative lambda exceeds lambda_c
-            image *= alpha;
+            dst = src * alpha;
         else
-            image *= currAlpha;
+            dst = src * currAlpha;
         break;
     case GAUSSIAN:
-        image *= alpha;
+        dst = src * alpha;
         break;
     default:
         break;
@@ -326,16 +347,17 @@ void VideoProcessor::concat(const std::vector<cv::Mat_<cv::Vec3f> > &frames,
 {
     cv::Size frameSize = frames.at(0).size();
     cv::Mat_<cv::Vec3f> temp(frameSize.width*frameSize.height, length-1, CV_8UC3);
-    for (int i = 0; i < length-1; ++i) {    // get a frame if any
+    for (int i = 0; i < length-1; ++i) {
+        // get a frame if any
         cv::Mat_<cv::Vec3f> input = frames.at(i);
+        // reshape the frame into one column
         cv::Mat_<cv::Vec3f> reshaped = input.reshape(3, input.cols*input.rows).clone();
         cv::Mat_<cv::Vec3f> line = temp.col(i);
-        // save the reshaped single frame as a column of the destinate big image
+        // save the reshaped frame to one column of the destinate big image
         reshaped.copyTo(line);
     }
     temp.copyTo(dst);
 }
-
 
 void VideoProcessor::deConcat(const cv::Mat_<cv::Vec3f> &src,
                               const cv::Size &frameSize,
@@ -837,7 +859,7 @@ void VideoProcessor::motionMagnify()
             for (int i=0; i<levels; ++i) {
                 curLevel = i;
 
-                amplify(filtered.at(i));
+                amplify(filtered.at(i), filtered.at(i));
 
                 // go one level down on pyramid
                 // representative lambda will reduce by factor of 2
@@ -906,12 +928,12 @@ void VideoProcessor::colorMagnify()
     // video frames
     std::vector<cv::Mat_<cv::Vec3f> > frames;
     // down-sampled frames
-    std::vector<cv::Mat_<cv::Vec3f> > dFrames;
+    std::vector<cv::Mat_<cv::Vec3f> > downSampledFrames;
     // filtered frames
     std::vector<cv::Mat_<cv::Vec3f> > filteredFrames;
 
     // concatenate image of all the down-sample frames
-    cv::Mat_<cv::Vec3f> sequence;
+    cv::Mat_<cv::Vec3f> videoMat;
     // concatenate filtered image
     cv::Mat_<cv::Vec3f> filtered;
 
@@ -935,10 +957,11 @@ void VideoProcessor::colorMagnify()
     while (getNextFrame(input) && !isStop()) {
         // convert to ntsc color space
         temp = input.clone();
+        // rgb2ntsc(temp, temp);
         frames.push_back(temp);
         std::vector<cv::Mat_<cv::Vec3f> > pyramid;
         spatialFilter(temp, pyramid);
-        dFrames.push_back(pyramid.at(levels-1));
+        downSampledFrames.push_back(pyramid.at(levels-1));
         // update process
         std::string msg= "Spatial Filtering...";
         emit updateProcessProgress(msg, floor((fnumber++) * 100.0 / length));
@@ -953,33 +976,33 @@ void VideoProcessor::colorMagnify()
     // 2. concat all the frames into a single large Mat
     // where each column is a reshaped single frame
     // (for processing convenience)
-    concat(dFrames, sequence);
+    concat(downSampledFrames, videoMat);
 
     // 3. temporal filtering
-    temporalFilter(sequence, filtered);
+    temporalFilter(videoMat, filtered);
 
     // 4. amplify color motion
-    amplify(filtered);
+    amplify(filtered, filtered);
 
     // 5. de-concat the filtered image into filtered frames
-    deConcat(filtered, dFrames.at(0).size(), filteredFrames);
+    deConcat(filtered, downSampledFrames.at(0).size(), filteredFrames);
 
     // 6. amplify each frame
     // by adding frame image and motions
     // and write into video
     fnumber = 0;
     for (int i=0; i<length-1 && !isStop(); ++i) {
-        // up-sample the motion image
+        // up-sample the motion image        
         upsamplingFromGaussianPyramid(filteredFrames.at(i), levels, motion);
         temp = frames.at(i) + motion;
         // convert back to ntsc color space
+        // ntsc2rgb(temp, temp);
         output = temp.clone();
         double minVal, maxVal;
         minMaxLoc(output, &minVal, &maxVal); //find minimum and maximum intensities
         output.convertTo(output, CV_8UC3, 255.0/(maxVal - minVal),
                   -minVal * 255.0/(maxVal - minVal));
         tempWriter.write(output);
-
         std::string msg= "Amplifying...";
         emit updateProcessProgress(msg, floor((fnumber++) * 100.0 / length));
     }
