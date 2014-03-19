@@ -197,7 +197,7 @@ void VideoProcessor::temporalFilter(const cv::Mat &src,
 
 /** 
  * temporalIIRFilter	-	temporal IIR filtering an image
- *
+ *                          (thanks to Yusuke Tomoto)
  * @param pyramid	-	source image
  * @param filtered	-	filtered result
  *
