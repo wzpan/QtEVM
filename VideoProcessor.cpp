@@ -977,7 +977,6 @@ void VideoProcessor::colorMagnify()
 
     // 1. spatial filtering
     while (getNextFrame(input) && !isStop()) {
-        // convert to ntsc color space
         temp = input.clone();
         frames.push_back(temp);
         // spatial filtering

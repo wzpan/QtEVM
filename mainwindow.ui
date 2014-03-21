@@ -372,7 +372,7 @@
     <string>&amp;Motion</string>
    </property>
    <property name="shortcut">
-    <string>Ctrl+M</string>
+    <string>Ctrl+Shift+M</string>
    </property>
    <property name="visible">
     <bool>true</bool>
@@ -386,7 +386,7 @@
     <string>&amp;Color</string>
    </property>
    <property name="shortcut">
-    <string>Ctrl+C</string>
+    <string>Ctrl+Shift+C</string>
    </property>
    <property name="visible">
     <bool>true</bool>
