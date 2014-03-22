@@ -29,6 +29,6 @@ More info: http://people.csail.mit.edu/mrub/vidmag/
 
 ## Credits ##
 
-* The IIR bandpass filter is adopted from [yusuketomoto/ofxEvm](https://github.com/yusuketomoto/ofxEvm);
+* The IIR bandpass filter and color space transform functions are directly adopted from [yusuketomoto/ofxEvm](https://github.com/yusuketomoto/ofxEvm);
 * [Daniel Ron](http://web.mit.edu/dron/www/portfolio/) is a super nice person. He has experience on implementing the EVM algorithm and gave me lots of useful hints;
 * Also thanks [@alessandro-gentilini](https://github.com/alessandro-gentilini) , who shared a great example of [a spatial butterworth bandpass filter](https://github.com/alessandro-gentilini/opencv_exercises-butterworth) and answered some questions on temporal filtering for me.
