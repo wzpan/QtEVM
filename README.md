@@ -23,6 +23,10 @@ More info: http://people.csail.mit.edu/mrub/vidmag/
 
 ![](https://raw2.github.com/wzpan/QtEVM/master/Screenshots/QtEVM.png)
 
+## License ##
+
+
+
 ## Credits ##
 
 * The IIR bandpass filter is adopted from [yusuketomoto/ofxEvm](https://github.com/yusuketomoto/ofxEvm);

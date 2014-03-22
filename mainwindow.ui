@@ -269,7 +269,7 @@
      <normaloff>:/myImages/actions/document-save-as.png</normaloff>:/myImages/actions/document-save-as.png</iconset>
    </property>
    <property name="text">
-    <string>Save as</string>
+    <string>Save as Video</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+Shift+S</string>
