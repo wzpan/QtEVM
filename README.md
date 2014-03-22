@@ -25,7 +25,7 @@ More info: http://people.csail.mit.edu/mrub/vidmag/
 
 ## License ##
 
-
+[LGPL v3](https://github.com/wzpan/QtEVM/raw/master/LICENSE)
 
 ## Credits ##
 
