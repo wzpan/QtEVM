@@ -904,16 +904,16 @@ void VideoProcessor::motionMagnify()
             }
         }
 
-        // 5. reconstruct motion image from filtered pyramid
+        // 4. reconstruct motion image from filtered pyramid
         reconImgFromLaplacianPyramid(filtered, levels, motion);
 
-        // 6. attenuate I, Q channels
+        // 5. attenuate I, Q channels
         attenuate(motion, motion);
 
-        // 7. combine source frame and motion image
+        // 6. combine source frame and motion image
         s += motion;
 
-        // 8. convert back to rgb color space and CV_8UC3
+        // 7. convert back to rgb color space and CV_8UC3
         ntsc2rgb(s, s);
         output = s.clone();
         double minVal, maxVal;
