@@ -221,7 +221,6 @@ void VideoProcessor::temporalFilter(const cv::Mat &src,
  * @param pyramid	-	source image
  * @param filtered	-	filtered result
  *
- * @return true if amplifying is allowed; false otherwise
  */
 void VideoProcessor::temporalIIRFilter(const cv::Mat &src,
                                     cv::Mat &dst)
@@ -240,7 +239,6 @@ void VideoProcessor::temporalIIRFilter(const cv::Mat &src,
  * @param pyramid	-	source pyramid of concatenate frames
  * @param filtered	-	concatenate filtered result
  *
- * @return true if amplifying is allowed; false otherwise
  */
 void VideoProcessor::temporalIdealFilter(const cv::Mat &src,
                                           cv::Mat &dst)
