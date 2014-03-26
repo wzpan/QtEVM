@@ -857,12 +857,12 @@ void VideoProcessor::motionMagnify()
             break;
 
         input.convertTo(input, CV_32FC3, 1.0/255.0f);
-        cv::Mat_<cv::Vec3f> s = input.clone();
 
-        // 1. convert to ntsc color space
-        rgb2ntsc(s, s);
+        // 1. convert to Lab color space
+        cv::cvtColor(input, input, CV_BGR2Lab);
 
         // 2. spatial filtering one frame
+        cv::Mat_<cv::Vec3f> s = input.clone();
         spatialFilter(s, pyramid);
 
         // 3. temporal filtering one frame's pyramid
@@ -910,13 +910,12 @@ void VideoProcessor::motionMagnify()
         attenuate(motion, motion);
 
         // 6. combine source frame and motion image
-        s += motion;
+        if (fnumber > 0)    // don't amplify first frame
+            s += motion;
 
         // 7. convert back to rgb color space and CV_8UC3
-        ntsc2rgb(s, s);
         output = s.clone();
-        double minVal, maxVal;
-        minMaxLoc(output, &minVal, &maxVal); //find minimum and maximum intensities
+        cv::cvtColor(output, output, CV_Lab2BGR);
         output.convertTo(output, CV_8UC3, 255.0, 1.0/255.0);
 
         // write the frame to the temp file

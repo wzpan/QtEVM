@@ -33,7 +33,6 @@
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include "SpatialFilter.h"
-#include "Utils.h"
 
 enum spatialFilterType {LAPLACIAN, GAUSSIAN};
 enum temporalFilterType {IIR, IDEAL};
