@@ -40,7 +40,7 @@ VideoProcessor::VideoProcessor(QObject *parent)
   , fh(0.4)
   , chromAttenuation(0.1)
   , delta(0)
-  , exaggeration_factor(0.2)
+  , exaggeration_factor(2.0)
   , lambda(0)
 {
     connect(this, SIGNAL(revert()), this, SLOT(revertVideo()));
@@ -297,7 +297,9 @@ void VideoProcessor::amplify(const cv::Mat &src, cv::Mat &dst)
         //compute modified alpha for this level
         currAlpha = lambda/delta/8 - 1;
         currAlpha *= exaggeration_factor;
-        if (curLevel==levels-1 || curLevel==0)     // ignore the highest and lowest frequency band
+//        qDebug("currAlpha: %f", currAlpha);
+//        qDebug("alpha: %f", alpha);
+        if (curLevel==levels || curLevel==0)     // ignore the highest and lowest frequency band
             dst = src * 0;
         else if (currAlpha > alpha)  // representative lambda exceeds lambda_c
             dst = src * alpha;
@@ -856,10 +858,11 @@ void VideoProcessor::motionMagnify()
         if (!getNextFrame(input))
             break;
 
-        cv::Mat_<cv::Vec3f> s;
+        input.convertTo(input, CV_32FC3, 1.0/255.0f);
+        cv::Mat_<cv::Vec3f> s = input.clone();
 
         // 1. convert to ntsc color space
-        rgb2ntsc(input, s);
+        rgb2ntsc(s, s);
 
         // 2. spatial filtering one frame
         spatialFilter(s, pyramid);
@@ -891,7 +894,7 @@ void VideoProcessor::motionMagnify()
             // for the lowest spatial frequency band of Laplacian pyramid
             lambda = sqrt(w*w + h*h)/3;  // 3 is experimental constant
 
-            for (int i=0; i<levels; ++i) {
+            for (int i=levels; i>=0; i--) {
                 curLevel = i;
 
                 amplify(filtered.at(i), filtered.at(i));
@@ -916,9 +919,7 @@ void VideoProcessor::motionMagnify()
         output = s.clone();
         double minVal, maxVal;
         minMaxLoc(output, &minVal, &maxVal); //find minimum and maximum intensities
-        output.convertTo(output, CV_8UC3, 255.0/(maxVal - minVal),
-                  -minVal * 255.0/(maxVal - minVal));
-
+        output.convertTo(output, CV_8UC3, 255.0, 1.0/255.0);
 
         // write the frame to the temp file
         tempWriter.write(output);
