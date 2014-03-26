@@ -297,8 +297,6 @@ void VideoProcessor::amplify(const cv::Mat &src, cv::Mat &dst)
         //compute modified alpha for this level
         currAlpha = lambda/delta/8 - 1;
         currAlpha *= exaggeration_factor;
-//        qDebug("currAlpha: %f", currAlpha);
-//        qDebug("alpha: %f", alpha);
         if (curLevel==levels || curLevel==0)     // ignore the highest and lowest frequency band
             dst = src * 0;
         else if (currAlpha > alpha)  // representative lambda exceeds lambda_c
