@@ -35,7 +35,7 @@ VideoProcessor::VideoProcessor(QObject *parent)
   , extension(".avi")
   , levels(4)
   , alpha(10)
-  , lambda_c(16)
+  , lambda_c(80)
   , fl(0.05)
   , fh(0.4)
   , chromAttenuation(0.1)
@@ -299,10 +299,8 @@ void VideoProcessor::amplify(const cv::Mat &src, cv::Mat &dst)
         currAlpha *= exaggeration_factor;
         if (curLevel==levels || curLevel==0)     // ignore the highest and lowest frequency band
             dst = src * 0;
-        else if (currAlpha > alpha)  // representative lambda exceeds lambda_c
-            dst = src * alpha;
         else
-            dst = src * currAlpha;
+            dst = src * cv::min(alpha, currAlpha);
         break;
     case GAUSSIAN:
         dst = src * alpha;
