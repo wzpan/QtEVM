@@ -227,8 +227,8 @@ private:
     std::vector<std::string> tempFileList;
 
     // low pass filters for IIR
-    std::vector<cv::Mat_<cv::Vec3f> > lowpass1;
-    std::vector<cv::Mat_<cv::Vec3f> > lowpass2;
+    std::vector<cv::Mat> lowpass1;
+    std::vector<cv::Mat> lowpass2;
 
     // recalculate the number of frames in video
     // normally doesn't need it unless getLength()
@@ -246,7 +246,7 @@ private:
     bool createTemp(double framerate=0.0, bool isColor=true);
 
     // spatial filtering
-    bool spatialFilter(const cv::Mat &src, std::vector<cv::Mat_<cv::Vec3f> > &pyramid);
+    bool spatialFilter(const cv::Mat &src, std::vector<cv::Mat> &pyramid);
 
     // temporal filtering
     void temporalFilter(const cv::Mat &src,
@@ -267,10 +267,10 @@ private:
     void attenuate(cv::Mat &src, cv::Mat &dst);
 
     // concat images into a large Mat
-    void concat(const std::vector<cv::Mat_<cv::Vec3f> > &frames, cv::Mat_<cv::Vec3f> &dst);
+    void concat(const std::vector<cv::Mat> &frames, cv::Mat_<cv::Vec3f> &dst);
 
     // de-concat the concatnate image into frames
-    void deConcat(const cv::Mat_<cv::Vec3f> &src, const cv::Size &frameSize, std::vector<cv::Mat_<cv::Vec3f> > &frames);
+    void deConcat(const cv::Mat_<cv::Vec3f> &src, const cv::Size &frameSize, std::vector<cv::Mat> &frames);
 
     // create an ideal bandpass processor
     void createIdealBandpassFilter(cv::Mat &filter, double fl, double fh, double rate);

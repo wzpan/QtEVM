@@ -29,7 +29,7 @@
  * @return true if success
  */
 bool buildLaplacianPyramid(const cv::Mat &img, const int levels,
-                           std::vector<cv::Mat_<cv::Vec3f> > &pyramid)
+                           std::vector<cv::Mat> &pyramid)
 {
     if (levels < 1){
         perror("Levels should be larger than 1");
@@ -60,7 +60,7 @@ bool buildLaplacianPyramid(const cv::Mat &img, const int levels,
  */
 bool buildGaussianPyramid(const cv::Mat &img,
                           const int levels,
-                          std::vector<cv::Mat_<cv::Vec3f> > &pyramid)
+                          std::vector<cv::Mat> &pyramid)
 {
     if (levels < 1){
         perror("Levels should be larger than 1");
@@ -84,9 +84,9 @@ bool buildGaussianPyramid(const cv::Mat &img,
  * @param levels	-	levels of the pyramid
  * @param dst		-	destinate image
  */
-void reconImgFromLaplacianPyramid(const std::vector<cv::Mat_<cv::Vec3f> > &pyramid,
+void reconImgFromLaplacianPyramid(const std::vector<cv::Mat> &pyramid,
                                   const int levels,
-                                  cv::Mat_<cv::Vec3f> &dst)
+                                  cv::Mat &dst)
 {
     cv::Mat currentImg = pyramid[levels];
     for (int l=levels-1; l>=0; l--) {
@@ -106,7 +106,7 @@ void reconImgFromLaplacianPyramid(const std::vector<cv::Mat_<cv::Vec3f> > &pyram
  */
 void upsamplingFromGaussianPyramid(const cv::Mat &src,
                                    const int levels,
-                                   cv::Mat_<cv::Vec3f> &dst)
+                                   cv::Mat &dst)
 {
     cv::Mat currentLevel = src.clone();
     for (int i = 0; i < levels; ++i) {

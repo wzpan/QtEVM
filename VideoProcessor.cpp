@@ -178,7 +178,7 @@ void VideoProcessor::calculateLength()
  * @param src		-	source image 
  * @param pyramid	-	destinate pyramid
  */
-bool VideoProcessor::spatialFilter(const cv::Mat &src, std::vector<cv::Mat_<cv::Vec3f> > &pyramid)
+bool VideoProcessor::spatialFilter(const cv::Mat &src, std::vector<cv::Mat> &pyramid)
 {
     switch (spatialType) {
     case LAPLACIAN:     // laplacian pyramid
@@ -262,7 +262,7 @@ void VideoProcessor::temporalIdealFilter(const cv::Mat &src,
                            cv::BORDER_CONSTANT, cv::Scalar::all(0));
 
         // do the DFT
-        cv::dft(tempImg, tempImg, cv::DFT_ROWS | cv::DFT_SCALE, tempImg.rows);
+        cv::dft(tempImg, tempImg, cv::DFT_ROWS | cv::DFT_SCALE);
 
         // construct the filter
         cv::Mat filter = tempImg.clone();
@@ -272,7 +272,7 @@ void VideoProcessor::temporalIdealFilter(const cv::Mat &src,
         cv::mulSpectrums(tempImg, filter, tempImg, cv::DFT_ROWS);
 
         // do the inverse DFT on filtered image
-        cv::idft(tempImg, tempImg, cv::DFT_ROWS | cv::DFT_SCALE, tempImg.rows);
+        cv::idft(tempImg, tempImg, cv::DFT_ROWS | cv::DFT_SCALE);
 
         // copy back to the current channel
         tempImg(cv::Rect(0, 0, current.cols, current.rows)).copyTo(channels[i]);
@@ -333,17 +333,17 @@ void VideoProcessor::attenuate(cv::Mat &src, cv::Mat &dst)
  * @param frames	-	frames of the video sequence
  * @param dst		-	destinate concatnate image
  */
-void VideoProcessor::concat(const std::vector<cv::Mat_<cv::Vec3f> > &frames,
+void VideoProcessor::concat(const std::vector<cv::Mat> &frames,
                             cv::Mat_<cv::Vec3f> &dst)
 {
     cv::Size frameSize = frames.at(0).size();
-    cv::Mat_<cv::Vec3f> temp(frameSize.width*frameSize.height, length-1, CV_8UC3);
+    cv::Mat temp(frameSize.width*frameSize.height, length-1, CV_8UC3);
     for (int i = 0; i < length-1; ++i) {
         // get a frame if any
-        cv::Mat_<cv::Vec3f> input = frames.at(i);
+        cv::Mat input = frames.at(i);
         // reshape the frame into one column
-        cv::Mat_<cv::Vec3f> reshaped = input.reshape(3, input.cols*input.rows).clone();
-        cv::Mat_<cv::Vec3f> line = temp.col(i);
+        cv::Mat reshaped = input.reshape(3, input.cols*input.rows).clone();
+        cv::Mat line = temp.col(i);
         // save the reshaped frame to one column of the destinate big image
         reshaped.copyTo(line);
     }
@@ -359,11 +359,11 @@ void VideoProcessor::concat(const std::vector<cv::Mat_<cv::Vec3f> > &frames,
  */
 void VideoProcessor::deConcat(const cv::Mat_<cv::Vec3f> &src,
                               const cv::Size &frameSize,
-                              std::vector<cv::Mat_<cv::Vec3f> > &frames)
+                              std::vector<cv::Mat> &frames)
 {
     for (int i = 0; i < length-1; ++i) {    // get a line if any
-        cv::Mat_<cv::Vec3f> line = src.col(i).clone();
-        cv::Mat_<cv::Vec3f> reshaped = line.reshape(3, frameSize.height).clone();
+        cv::Mat line = src.col(i).clone();
+        cv::Mat reshaped = line.reshape(3, frameSize.height).clone();
         frames.push_back(reshaped);
     }
 }
@@ -828,10 +828,10 @@ void VideoProcessor::motionMagnify()
     cv::Mat output;
 
     // motion image
-    cv::Mat_<cv::Vec3f> motion;
+    cv::Mat motion;
 
-    std::vector<cv::Mat_<cv::Vec3f> > pyramid;
-    std::vector<cv::Mat_<cv::Vec3f> > filtered;
+    std::vector<cv::Mat> pyramid;
+    std::vector<cv::Mat> filtered;
 
     // if no capture device has been set
     if (!isOpened())
@@ -860,7 +860,7 @@ void VideoProcessor::motionMagnify()
         cv::cvtColor(input, input, CV_BGR2Lab);
 
         // 2. spatial filtering one frame
-        cv::Mat_<cv::Vec3f> s = input.clone();
+        cv::Mat s = input.clone();
         spatialFilter(s, pyramid);
 
         // 3. temporal filtering one frame's pyramid
@@ -957,21 +957,21 @@ void VideoProcessor::colorMagnify()
     cv::Mat output;
     // motion image
 
-    cv::Mat_<cv::Vec3f> motion;
+    cv::Mat motion;
     // temp image
     cv::Mat_<cv::Vec3f> temp;
 
     // video frames
-    std::vector<cv::Mat_<cv::Vec3f> > frames;
+    std::vector<cv::Mat> frames;
     // down-sampled frames
-    std::vector<cv::Mat_<cv::Vec3f> > downSampledFrames;
+    std::vector<cv::Mat> downSampledFrames;
     // filtered frames
-    std::vector<cv::Mat_<cv::Vec3f> > filteredFrames;
+    std::vector<cv::Mat> filteredFrames;
 
     // concatenate image of all the down-sample frames
     cv::Mat_<cv::Vec3f> videoMat;
     // concatenate filtered image
-    cv::Mat_<cv::Vec3f> filtered;
+    cv::Mat filtered;
 
     // if no capture device has been set
     if (!isOpened())
@@ -994,8 +994,8 @@ void VideoProcessor::colorMagnify()
         temp = input.clone();
         frames.push_back(temp);
         // spatial filtering
-        std::vector<cv::Mat_<cv::Vec3f> > pyramid;
-        spatialFilter(temp, pyramid);
+        std::vector<cv::Mat> pyramid;
+        spatialFilter(input, pyramid);
         downSampledFrames.push_back(pyramid.at(levels-1));
         // update process
         std::string msg= "Spatial Filtering...";
@@ -1032,10 +1032,12 @@ void VideoProcessor::colorMagnify()
         temp = frames.at(i) + motion;
         // convert back to ntsc color space
         output = temp.clone();
+
         double minVal, maxVal;
         minMaxLoc(output, &minVal, &maxVal); //find minimum and maximum intensities
         output.convertTo(output, CV_8UC3, 255.0/(maxVal - minVal),
                   -minVal * 255.0/(maxVal - minVal));
+//        output.convertTo(output, CV_8UC3, 255.0f, 1.0/255.0f);
         tempWriter.write(output);
         std::string msg= "Amplifying...";
         emit updateProcessProgress(msg, floor((fnumber++) * 100.0 / length));
