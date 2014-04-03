@@ -16,12 +16,10 @@ SOURCES += main.cpp\
     WindowHelper.cpp \
     VideoProcessor.cpp \
     SpatialFilter.cpp \
-    Utils.cpp \
     MotionDialog.cpp
 
 HEADERS  += mainwindow.h \
     WindowHelper.h \
-    Utils.h \
     VideoProcessor.h \
     SpatialFilter.h \
     MotionDialog.h
