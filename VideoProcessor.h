@@ -267,10 +267,10 @@ private:
     void attenuate(cv::Mat &src, cv::Mat &dst);
 
     // concat images into a large Mat
-    void concat(const std::vector<cv::Mat> &frames, cv::Mat_<cv::Vec3f> &dst);
+    void concat(const std::vector<cv::Mat> &frames, cv::Mat &dst);
 
     // de-concat the concatnate image into frames
-    void deConcat(const cv::Mat_<cv::Vec3f> &src, const cv::Size &frameSize, std::vector<cv::Mat> &frames);
+    void deConcat(const cv::Mat &src, const cv::Size &frameSize, std::vector<cv::Mat> &frames);
 
     // create an ideal bandpass processor
     void createIdealBandpassFilter(cv::Mat &filter, double fl, double fh, double rate);

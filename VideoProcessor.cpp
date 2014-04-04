@@ -334,10 +334,10 @@ void VideoProcessor::attenuate(cv::Mat &src, cv::Mat &dst)
  * @param dst		-	destinate concatnate image
  */
 void VideoProcessor::concat(const std::vector<cv::Mat> &frames,
-                            cv::Mat_<cv::Vec3f> &dst)
+                            cv::Mat &dst)
 {
     cv::Size frameSize = frames.at(0).size();
-    cv::Mat temp(frameSize.width*frameSize.height, length-1, CV_8UC3);
+    cv::Mat temp(frameSize.width*frameSize.height, length-1, CV_32FC3);
     for (int i = 0; i < length-1; ++i) {
         // get a frame if any
         cv::Mat input = frames.at(i);
@@ -357,7 +357,7 @@ void VideoProcessor::concat(const std::vector<cv::Mat> &frames,
  * @param framesize	-	frame size
  * @param frames	-	destinate frames
  */
-void VideoProcessor::deConcat(const cv::Mat_<cv::Vec3f> &src,
+void VideoProcessor::deConcat(const cv::Mat &src,
                               const cv::Size &frameSize,
                               std::vector<cv::Mat> &frames)
 {
@@ -959,7 +959,7 @@ void VideoProcessor::colorMagnify()
 
     cv::Mat motion;
     // temp image
-    cv::Mat_<cv::Vec3f> temp;
+    cv::Mat temp;
 
     // video frames
     std::vector<cv::Mat> frames;
@@ -969,7 +969,7 @@ void VideoProcessor::colorMagnify()
     std::vector<cv::Mat> filteredFrames;
 
     // concatenate image of all the down-sample frames
-    cv::Mat_<cv::Vec3f> videoMat;
+    cv::Mat videoMat;
     // concatenate filtered image
     cv::Mat filtered;
 
@@ -991,11 +991,11 @@ void VideoProcessor::colorMagnify()
 
     // 1. spatial filtering
     while (getNextFrame(input) && !isStop()) {
-        temp = input.clone();
+        input.convertTo(temp, CV_32FC3);
         frames.push_back(temp);
         // spatial filtering
         std::vector<cv::Mat> pyramid;
-        spatialFilter(input, pyramid);
+        spatialFilter(temp, pyramid);
         downSampledFrames.push_back(pyramid.at(levels-1));
         // update process
         std::string msg= "Spatial Filtering...";
@@ -1032,7 +1032,6 @@ void VideoProcessor::colorMagnify()
         temp = frames.at(i) + motion;
         // convert back to ntsc color space
         output = temp.clone();
-
         double minVal, maxVal;
         minMaxLoc(output, &minVal, &maxVal); //find minimum and maximum intensities
         output.convertTo(output, CV_8UC3, 255.0/(maxVal - minVal),
