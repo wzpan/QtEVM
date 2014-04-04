@@ -1037,7 +1037,6 @@ void VideoProcessor::colorMagnify()
         minMaxLoc(output, &minVal, &maxVal); //find minimum and maximum intensities
         output.convertTo(output, CV_8UC3, 255.0/(maxVal - minVal),
                   -minVal * 255.0/(maxVal - minVal));
-//        output.convertTo(output, CV_8UC3, 255.0f, 1.0/255.0f);
         tempWriter.write(output);
         std::string msg= "Amplifying...";
         emit updateProcessProgress(msg, floor((fnumber++) * 100.0 / length));
