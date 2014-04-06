@@ -992,7 +992,7 @@ void VideoProcessor::colorMagnify()
     // 1. spatial filtering
     while (getNextFrame(input) && !isStop()) {
         input.convertTo(temp, CV_32FC3);
-        frames.push_back(temp);
+        frames.push_back(temp.clone());
         // spatial filtering
         std::vector<cv::Mat> pyramid;
         spatialFilter(temp, pyramid);
