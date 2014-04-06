@@ -204,9 +204,9 @@ bool MainWindow::saveAs()
 bool MainWindow::saveFile(const QString &fileName)
 {
     if (QFileInfo(fileName).suffix() == ""){
-        video->setOutput(fileName.toStdString(), ".avi");
+        video->setOutput(QFileInfo(fileName).filePath().toStdString(), ".avi");
     } else {
-        video->setOutput(QFileInfo(fileName).fileName().toStdString());
+        video->setOutput(QFileInfo(fileName).filePath().toStdString());
     }
 
     // change the cursor
