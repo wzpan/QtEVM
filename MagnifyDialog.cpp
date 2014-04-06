@@ -17,13 +17,13 @@
 // 02110-1301 USA
 // 
 
-#include "MotionDialog.h"
+#include "MagnifyDialog.h"
 #include <string.h>
-#include "ui_MotionDialog.h"
+#include "ui_MagnifyDialog.h"
 
-MotionDialog::MotionDialog(QWidget *parent, VideoProcessor *processor) :
+MagnifyDialog::MagnifyDialog(QWidget *parent, VideoProcessor *processor) :
     QDialog(parent),
-    ui(new Ui::MotionDialog)
+    ui(new Ui::MagnifyDialog)
 {
     ui->setupUi(this);
 
@@ -53,12 +53,12 @@ MotionDialog::MotionDialog(QWidget *parent, VideoProcessor *processor) :
     ui->chromLabel->setText(QString::fromStdString(ss.str()));
 }
 
-MotionDialog::~MotionDialog()
+MagnifyDialog::~MagnifyDialog()
 {
     delete ui;
 }
 
-void MotionDialog::on_alphaSlider_valueChanged(int value)
+void MagnifyDialog::on_alphaSlider_valueChanged(int value)
 {
     processor->alpha = value;
     std::stringstream ss;
@@ -66,7 +66,7 @@ void MotionDialog::on_alphaSlider_valueChanged(int value)
     ui->alphaLabel->setText(QString::fromStdString(ss.str()));
 }
 
-void MotionDialog::on_lambdaSlider_valueChanged(int value)
+void MagnifyDialog::on_lambdaSlider_valueChanged(int value)
 {
     processor->lambda_c = value;
     std::stringstream ss;
@@ -74,7 +74,7 @@ void MotionDialog::on_lambdaSlider_valueChanged(int value)
     ui->lambdaLabel->setText(QString::fromStdString(ss.str()));
 }
 
-void MotionDialog::on_flSlider_valueChanged(int value)
+void MagnifyDialog::on_flSlider_valueChanged(int value)
 {
     processor->fl = value / 100.0;
     std::stringstream ss;
@@ -82,7 +82,7 @@ void MotionDialog::on_flSlider_valueChanged(int value)
     ui->flLabel->setText(QString::fromStdString(ss.str()));
 }
 
-void MotionDialog::on_fhSlider_valueChanged(int value)
+void MagnifyDialog::on_fhSlider_valueChanged(int value)
 {
     processor->fh = value / 100.0;
     std::stringstream ss;
@@ -90,7 +90,7 @@ void MotionDialog::on_fhSlider_valueChanged(int value)
     ui->fhLabel->setText(QString::fromStdString(ss.str()));
 }
 
-void MotionDialog::on_chromSlider_valueChanged(int value)
+void MagnifyDialog::on_chromSlider_valueChanged(int value)
 {
     processor->chromAttenuation = value / 10.0;
     std::stringstream ss;

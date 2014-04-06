@@ -31,7 +31,7 @@
 #include <QLabel>
 #include <queue>
 #include "VideoProcessor.h"
-#include "MotionDialog.h"
+#include "MagnifyDialog.h"
 #include "WindowHelper.h"
 #include <opencv2/core/core.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
@@ -124,7 +124,7 @@ private:
     QProgressDialog *progressDialog;
 
     // Motion Magnification dialog
-    MotionDialog *motionDialog;
+    MagnifyDialog *magnifyDialog;
 
     void updateStatus(bool vi);
     void updateTimeLabel();

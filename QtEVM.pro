@@ -16,16 +16,16 @@ SOURCES += main.cpp\
     WindowHelper.cpp \
     VideoProcessor.cpp \
     SpatialFilter.cpp \
-    MotionDialog.cpp
+    MagnifyDialog.cpp
 
 HEADERS  += mainwindow.h \
     WindowHelper.h \
     VideoProcessor.h \
     SpatialFilter.h \
-    MotionDialog.h
+    MagnifyDialog.h
 
 FORMS    += mainwindow.ui \
-    MotionDialog.ui
+    MagnifyDialog.ui
 
 RESOURCES += \
     myResources.qrc

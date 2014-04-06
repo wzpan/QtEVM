@@ -41,7 +41,7 @@ class VideoProcessor : public QObject {
 
     Q_OBJECT
 
-    friend class MotionDialog;
+    friend class MagnifyDialog;
 
 public:
 

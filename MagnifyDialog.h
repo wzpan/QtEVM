@@ -17,24 +17,24 @@
 // 02110-1301 USA
 // 
 
-#ifndef MOTIONDIALOG_H
-#define MOTIONDIALOG_H
+#ifndef MAGNIFYDIALOG_H
+#define MAGNIFYDIALOG_H
 
 #include <QDialog>
 #include <VideoProcessor.h>
 
 namespace Ui {
-class MotionDialog;
+class MagnifyDialog;
 }
 
-class MotionDialog : public QDialog
+class MagnifyDialog : public QDialog
 {
     Q_OBJECT
 
 public:
-    explicit MotionDialog(QWidget *parent = 0,
+    explicit MagnifyDialog(QWidget *parent = 0,
                          VideoProcessor *processor = 0);
-    ~MotionDialog();
+    ~MagnifyDialog();
 
 private slots:
     void on_alphaSlider_valueChanged(int value);
@@ -48,9 +48,9 @@ private slots:
     void on_chromSlider_valueChanged(int value);
 
 private:
-    Ui::MotionDialog *ui;
+    Ui::MagnifyDialog *ui;
     VideoProcessor *processor;
     QString alphaStr, lambdaStr, flStr, fhStr, chromStr;
 };
 
-#endif // MOTIONRDIALOG_H
+#endif // MAGNIFYDIALOG_H

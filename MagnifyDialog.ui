@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>MotionDialog</class>
- <widget class="QDialog" name="MotionDialog">
+ <class>MagnifyDialog</class>
+ <widget class="QDialog" name="MagnifyDialog">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -283,7 +283,7 @@
   <connection>
    <sender>okButton</sender>
    <signal>clicked()</signal>
-   <receiver>MotionDialog</receiver>
+   <receiver>MagnifyDialog</receiver>
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -299,7 +299,7 @@
   <connection>
    <sender>cancelButton</sender>
    <signal>clicked()</signal>
-   <receiver>MotionDialog</receiver>
+   <receiver>MagnifyDialog</receiver>
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">

@@ -39,8 +39,8 @@ MainWindow::MainWindow(QWidget *parent) :
     // progress dialog
     progressDialog =  0;
 
-    // Laplacian IIR amplify
-    motionDialog = 0;
+    // magnify dialog
+    magnifyDialog = 0;
 
     updateStatus(false);
 
@@ -522,14 +522,14 @@ void MainWindow::on_actionClean_Temp_Files_triggered()
 void MainWindow::on_motion_triggered()
 {
     // show parameter dialog
-    if (!motionDialog)
-        motionDialog = new MotionDialog(this, video);
+    if (!magnifyDialog)
+        magnifyDialog = new MagnifyDialog(this, video);
 
-    motionDialog->show();
-    motionDialog->raise();
-    motionDialog->activateWindow();
+    magnifyDialog->show();
+    magnifyDialog->raise();
+    magnifyDialog->activateWindow();
 
-    if (motionDialog->exec() == QDialog::Accepted) {
+    if (magnifyDialog->exec() == QDialog::Accepted) {
         // change the cursor
         QApplication::setOverrideCursor(Qt::WaitCursor);
         // run the process
@@ -543,14 +543,14 @@ void MainWindow::on_motion_triggered()
 void MainWindow::on_color_triggered()
 {
     // show parameter dialog
-    if (!motionDialog)
-        motionDialog = new MotionDialog(this, video);
+    if (!magnifyDialog)
+        magnifyDialog = new MagnifyDialog(this, video);
 
-    motionDialog->show();
-    motionDialog->raise();
-    motionDialog->activateWindow();
+    magnifyDialog->show();
+    magnifyDialog->raise();
+    magnifyDialog->activateWindow();
 
-    if (motionDialog->exec() == QDialog::Accepted) {
+    if (magnifyDialog->exec() == QDialog::Accepted) {
         // change the cursor
         QApplication::setOverrideCursor(Qt::WaitCursor);
         // run the process
