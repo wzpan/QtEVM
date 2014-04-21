@@ -1030,7 +1030,6 @@ void VideoProcessor::colorMagnify()
         // up-sample the motion image        
         upsamplingFromGaussianPyramid(filteredFrames.at(i), levels, motion);
         temp = frames.at(i) + motion;
-        // convert back to ntsc color space
         output = temp.clone();
         double minVal, maxVal;
         minMaxLoc(output, &minVal, &maxVal); //find minimum and maximum intensities
