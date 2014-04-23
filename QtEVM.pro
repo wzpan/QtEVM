@@ -32,8 +32,7 @@ RESOURCES += \
 
 unix {
     CONFIG += link_pkgconfig
-    PKGCONFIG += opencv \
-                fftw3
+    PKGCONFIG += opencv
 }
 Win32 {
 INCLUDEPATH += C:\OpenCV2.2\include\
