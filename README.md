@@ -1,7 +1,7 @@
 QtEVM
 =====
 
-Yet anther C++ implementation of EVM([Eulerian Video Magnification](http://people.csail.mit.edu/mrub/vidmag/)), based on OpenCV and Qt.
+C++ implementation of EVM([Eulerian Video Magnification](http://people.csail.mit.edu/mrub/vidmag/)), based on OpenCV and Qt.
 
 Supports:
 
@@ -12,7 +12,10 @@ Supports:
     - spatial filter: Gaussian Pyramid
 	- temporal filter: ideal bandpass filter
 
-More info: http://people.csail.mit.edu/mrub/vidmag/
+More info: 
+
+* [Official Paper](http://people.csail.mit.edu/mrub/vidmag/)
+* [My notes on EVM](http://hahack.com/codes/eulerian-video-magnification/)
 
 ## Dependencies ##
 
