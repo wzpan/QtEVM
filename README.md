@@ -21,7 +21,7 @@ More info: http://people.csail.mit.edu/mrub/vidmag/
 
 ## Screenshot ##
 
-![](https://raw2.github.com/wzpan/QtEVM/master/Screenshots/QtEVM.png)
+![](https://raw.githubusercontent.com/wzpan/QtEVM/master/Screenshots/QtEVM.png)
 
 ## License ##
 
