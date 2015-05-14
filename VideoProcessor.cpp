@@ -1029,6 +1029,7 @@ void VideoProcessor::colorMagnify()
     for (int i=0; i<length-1 && !isStop(); ++i) {
         // up-sample the motion image        
         upsamplingFromGaussianPyramid(filteredFrames.at(i), levels, motion);
+	resize(motion, motion, frames.at(i).size());
         temp = frames.at(i) + motion;
         output = temp.clone();
         double minVal, maxVal;
