@@ -28,7 +28,7 @@ More info:
 
 ## License ##
 
-* non-commercial research purposes only.
+* Please refer to [LICENCE.pdf](https://raw.githubusercontent.com/wzpan/QtEVM/master/LICENSE.pdf)
 
 ## Credits ##
 
