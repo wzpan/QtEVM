@@ -28,7 +28,6 @@ More info:
 
 ## License ##
 
-* [LGPL v3](https://github.com/wzpan/QtEVM/raw/master/LICENSE)
 * non-commercial research purposes only.
 
 ## Credits ##
